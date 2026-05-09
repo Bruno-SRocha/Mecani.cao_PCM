@@ -1,0 +1,264 @@
+/* ================================================================
+   MECÂNI.CÃO PCM — Design System Global
+   ================================================================
+   Paleta de cores extraída do logo.png da marca:
+   - Navy (azul marinho escuro):  #1B2A4A  — cor principal/textos
+   - Orange (engrenagem):         #E8842C  — cor de destaque/ação
+   - Teal (uniforme mascote):     #1A7A8A  — cor secundária/complementar
+
+   O design segue o tema industrial da marca com fundo escuro (dark mode),
+   tipografia moderna (Inter) e efeitos de glassmorphism para dar um visual
+   premium e profissional ao sistema SaaS de manutenção industrial.
+   ================================================================ */
+
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   Variáveis CSS globais — Design Tokens da marca Mecâni.cão
+   --------------------------------------------------------------- */
+:root {
+  /* Cores da marca (extraídas do logo.png) */
+  --navy: #1B2A4A;
+  --navy-light: #243556;
+  --navy-dark: #111D35;
+  --navy-950: #0A1120;
+
+  --orange: #E8842C;
+  --orange-light: #F09A4E;
+  --orange-dark: #C96E1E;
+  --orange-glow: rgba(232, 132, 44, 0.25);
+
+  --teal: #1A7A8A;
+  --teal-light: #22A0B4;
+  --teal-dark: #135B67;
+
+  /* Superfícies e fundos */
+  --bg-primary: #0C1322;
+  --bg-secondary: #111D35;
+  --bg-card: rgba(27, 42, 74, 0.45);
+  --bg-card-hover: rgba(27, 42, 74, 0.65);
+  --bg-glass: rgba(17, 29, 53, 0.7);
+
+  /* Texto */
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Bordas */
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-accent: rgba(232, 132, 44, 0.3);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px var(--orange-glow);
+
+  /* Raios de borda */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Transições */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------------------------------------------------------
+   Integração Tailwind v4 — Tokens do tema
+   --------------------------------------------------------------- */
+@theme inline {
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-navy-dark: var(--navy-dark);
+  --color-navy-950: var(--navy-950);
+
+  --color-orange: var(--orange);
+  --color-orange-light: var(--orange-light);
+  --color-orange-dark: var(--orange-dark);
+
+  --color-teal: var(--teal);
+  --color-teal-light: var(--teal-light);
+  --color-teal-dark: var(--teal-dark);
+
+  --color-surface: var(--bg-primary);
+  --color-surface-secondary: var(--bg-secondary);
+  --color-surface-card: var(--bg-card);
+
+  --color-txt-primary: var(--text-primary);
+  --color-txt-secondary: var(--text-secondary);
+  --color-txt-muted: var(--text-muted);
+
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/* ---------------------------------------------------------------
+   Reset e estilos base
+   --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------
+   Utilitários de vidro (Glassmorphism)
+   Efeito visual moderno para cards e painéis do sistema industrial.
+   --------------------------------------------------------------- */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ---------------------------------------------------------------
+   Animações customizadas
+   Micro-animações para melhorar a experiência do usuário.
+   --------------------------------------------------------------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--orange-glow);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--orange-glow), 0 0 48px rgba(232, 132, 44, 0.1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gearSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-gear-spin {
+  animation: gearSpin 12s linear infinite;
+}
+
+/* ---------------------------------------------------------------
+   Scrollbar customizada (tema industrial)
+   --------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--navy-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal);
+}
+
+/* ---------------------------------------------------------------
+   Seleção de texto (cor da marca)
+   --------------------------------------------------------------- */
+::selection {
+  background: var(--orange);
+  color: white;
+}
