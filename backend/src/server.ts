@@ -21,7 +21,11 @@ import cors from "cors";
 import { env } from "./config/env";
 import { AppDataSource } from "./config/database";
 import authRoutes from "./routes/auth.routes";
+import equipamentoRoutes from "./routes/equipamento.routes";
+import componenteRoutes from "./routes/componente.routes";
+import { diagnosticoEquipamentoRoutes, diagnosticoRoutes } from "./routes/diagnostico.routes";
 import { seedAdminUser } from "./config/seed";
+import { seedEquipamentos } from "./config/seed-equipamentos";
 
 const app = express();
 
@@ -65,6 +69,10 @@ app.get("/api/health", (_req, res) => {
    Cada módulo tem seu arquivo de rotas em /routes/.
    --------------------------------------------------------------- */
 app.use("/api/auth", authRoutes);
+app.use("/api/equipamentos", equipamentoRoutes);
+app.use("/api/equipamentos/:equipamentoId/componentes", componenteRoutes);
+app.use("/api/equipamentos/:equipamentoId/diagnosticos", diagnosticoEquipamentoRoutes);
+app.use("/api/diagnosticos", diagnosticoRoutes);
 
 /* ---------------------------------------------------------------
    Inicialização: Conexão com banco + Start do servidor
@@ -84,6 +92,9 @@ AppDataSource.initialize()
 
     /* Cria o usuário administrador padrão se não existir */
     await seedAdminUser();
+
+    /* Cria equipamentos de demonstração se não existirem */
+    await seedEquipamentos();
 
     /* Inicia o servidor HTTP */
     app.listen(env.PORT, () => {
