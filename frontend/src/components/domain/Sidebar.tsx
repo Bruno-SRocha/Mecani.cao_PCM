@@ -101,28 +101,37 @@ export default function Sidebar() {
         style={{ borderColor: "rgba(148, 163, 184, 0.08)" }}
       >
         <Image
-          src="/logo.png"
-          alt="MECÂNI.CÃO PCM"
-          width={140}
-          height={35}
+          src="/icon.png"
+          alt="Ícone"
+          width={32}
+          height={32}
           priority
         />
-        <span
-          className="px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase"
-          style={{
-            background: "rgba(232, 132, 44, 0.12)",
-            color: "#E8842C",
-            border: "1px solid rgba(232, 132, 44, 0.25)",
-          }}
-        >
-          PCM
-        </span>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="MECÂNI.CÃO PCM"
+            width={120}
+            height={30}
+            priority
+          />
+          <span
+            className="px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase"
+            style={{
+              background: "rgba(232, 132, 44, 0.12)",
+              color: "#E8842C",
+              border: "1px solid rgba(232, 132, 44, 0.25)",
+            }}
+          >
+            PCM
+          </span>
+        </div>
       </div>
 
       {/* =================================================================
           Links de navegação
           ================================================================= */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-5 py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
 
@@ -185,7 +194,7 @@ export default function Sidebar() {
           Área do usuário — parte inferior da sidebar
           ================================================================= */}
       <div
-        className="px-4 py-4 border-t"
+        className="px-5 py-5 border-t"
         style={{ borderColor: "rgba(148, 163, 184, 0.08)" }}
       >
         {/* Info do usuário logado */}
