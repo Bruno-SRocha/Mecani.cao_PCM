@@ -35,4 +35,6 @@ Interprete de forma criativa e faça escolhas inesperadas que pareçam genuiname
 
 **IMPORTANTE**: Ajuste a complexidade da implementação à visão estética. Designs complexos precisam de código elaborado com animações e efeitos extensos. Designs minimalistas ou refinados precisam de moderação, precisão e atenção extrema ao espaçamento, tipografia e detalhes sutis. A elegância sempre vem de executar a visão escolhida com altíssima qualidade técnica.
 
+**REGRA ESTRITA E IMUTÁVEL**: NUNCA modifique o design, a estrutura ou a estética da página de Login. O design da página de Login já está finalizado e deve ser rigorosamente preservado. Você não tem permissão para alterá-la, a menos que o usuário solicite e autorize explicitamente de forma expressa.
+
 **Lembre-se**: Um excelente Assistente IA/Agente é capaz de um trabalho criativo extraordinário. Não se contenha, mostre o que realmente pode ser criado ao pensar fora da caixa e comprometer-se totalmente com uma visão estética distinta e profissional, elevando o nível de produto do SaaS "Mecâni.cão PCM".
