@@ -7,8 +7,11 @@ import type { Equipamento, StatusEquipamento } from "@/types/equipamento.types";
 import { deleteComponenteApi } from "@/lib/api/componentes";
 import type { ComponenteComDesgaste } from "@/lib/api/componentes";
 import ComponenteFormModal from "@/components/domain/ComponenteFormModal";
+import ReporteSubstituicaoModal from "@/components/domain/ReporteSubstituicaoModal";
 import type { NivelUsuario } from "@/types/usuario.types";
 import DiagnosticoTab from "@/components/domain/DiagnosticoTab";
+import ModificacoesTab from "@/components/domain/ModificacoesTab";
+
 
 const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg: string }> = {
   OPERANDO: { label: "Operando", color: "#4ADE80", bg: "rgba(74, 222, 128, 0.1)" },
@@ -18,7 +21,7 @@ const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg
 
 function calcDesgaste(h: number, v: number) { return v > 0 ? Math.min((h / v) * 100, 100) : 0; }
 function desgasteColor(p: number) { return p >= 85 ? "#F87171" : p >= 60 ? "#FBBF24" : "#4ADE80"; }
-function desgasteLabel(p: number) { return p >= 85 ? "Crítico" : p >= 60 ? "Atenção" : "Normal"; }
+function desgasteLabel(p: number) { return p >= 85 ? "Crítico" : p >= 60 ? "Atenção" : "Saudável"; }
 
 function formatDate(d: string | null) {
   if (!d) return "—";
@@ -42,13 +45,14 @@ export default function EquipamentoDetalhesPage() {
   const [equipamento, setEquipamento] = useState<Equipamento | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
-  const [activeTab, setActiveTab] = useState<"VISAO_GERAL" | "DIAGNOSTICOS">("VISAO_GERAL");
+  const [activeTab, setActiveTab] = useState<"VISAO_GERAL" | "DIAGNOSTICOS" | "MODIFICACOES">("VISAO_GERAL");
   
   const [userId, setUserId] = useState("");
   const [userNivel, setUserNivel] = useState<NivelUsuario>("TECNICO");
   const [compModalOpen, setCompModalOpen] = useState(false);
   const [editComp, setEditComp] = useState<ComponenteComDesgaste | null>(null);
   const [deleteCompId, setDeleteCompId] = useState<string | null>(null);
+  const [reporteModalComp, setReporteModalComp] = useState<ComponenteComDesgaste | null>(null);
 
   const canWrite = userNivel === "ADMIN" || userNivel === "GESTOR";
 
@@ -173,6 +177,13 @@ export default function EquipamentoDetalhesPage() {
           Diagnóstico
           {activeTab === "DIAGNOSTICOS" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1A7A8A]" />}
         </button>
+        <button
+          onClick={() => setActiveTab("MODIFICACOES")}
+          className={`pb-4 text-[14px] font-semibold transition-all cursor-pointer relative ${activeTab === "MODIFICACOES" ? "text-white" : "text-gray-500 hover:text-gray-300"}`}
+        >
+          Modificações & BOM
+          {activeTab === "MODIFICACOES" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#1A7A8A]" />}
+        </button>
       </div>
 
       {activeTab === "VISAO_GERAL" ? (
@@ -266,6 +277,14 @@ export default function EquipamentoDetalhesPage() {
                           <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider shrink-0" style={{ background: `${cor}15`, color: cor }}>
                             {label}
                           </span>
+                          {comp.modificado && (
+                            <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0" style={{ background: "rgba(34, 160, 180, 0.15)", color: "#22A0B4", border: "1px solid rgba(34, 160, 180, 0.3)" }}>
+                              <svg className="w-3 h-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 21l8.982-11.795H14l1-7L6 14.09h3.813Z" />
+                              </svg>
+                              Modificado
+                            </span>
+                          )}
                         </div>
                         <p className="text-[13px] mt-1" style={{ color: "#64748B" }}>
                           Tipo: <span style={{ color: "#94A3B8" }}>{comp.tipo.replace(/_/g, " ")}</span>
@@ -289,6 +308,27 @@ export default function EquipamentoDetalhesPage() {
                           <div className="w-full h-2 rounded-full" style={{ background: "rgba(148, 163, 184, 0.1)" }}>
                             <div className="h-full rounded-full transition-all duration-700" style={{ width: `${desgaste}%`, background: cor }} />
                           </div>
+                        </div>
+
+                        {/* Botão Substituir — disponível para todos os perfis */}
+                        <div className="border-l pl-6" style={{ borderColor: "rgba(148, 163, 184, 0.1)" }}>
+                          <button
+                            onClick={() => setReporteModalComp(comp as ComponenteComDesgaste)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer text-[12px] font-semibold"
+                            style={{
+                              background: "rgba(232, 132, 44, 0.08)",
+                              color: "#E8842C",
+                              border: "1px solid rgba(232, 132, 44, 0.2)",
+                            }}
+                            title="Registrar substituição de componente"
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(232, 132, 44, 0.18)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(232, 132, 44, 0.08)"; }}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+                            </svg>
+                            Substituir
+                          </button>
                         </div>
 
                         {canWrite && (
@@ -325,11 +365,19 @@ export default function EquipamentoDetalhesPage() {
             )}
           </div>
         </>
-      ) : (
+      ) : activeTab === "DIAGNOSTICOS" ? (
         <DiagnosticoTab 
           equipamentoId={equipamento.id} 
           userNivel={userNivel}
           userId={userId}
+        />
+      ) : (
+        <ModificacoesTab
+          equipamentoId={equipamento.id}
+          userNivel={userNivel}
+          userId={userId}
+          componentes={equipamento.componentes as ComponenteComDesgaste[]}
+          onBOMUpdated={fetchEquipamento}
         />
       )}
 
@@ -371,6 +419,15 @@ export default function EquipamentoDetalhesPage() {
           componente={editComp}
           onClose={() => { setCompModalOpen(false); setEditComp(null); }}
           onSaved={() => { setCompModalOpen(false); setEditComp(null); fetchEquipamento(); }}
+        />
+      )}
+      {/* Reporte de Substituição Modal */}
+      {reporteModalComp && equipamento && (
+        <ReporteSubstituicaoModal
+          equipamentoId={equipamento.id}
+          componente={reporteModalComp}
+          onClose={() => setReporteModalComp(null)}
+          onSaved={() => { setReporteModalComp(null); }}
         />
       )}
     </div>

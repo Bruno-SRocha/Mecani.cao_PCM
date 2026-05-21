@@ -26,6 +26,7 @@ export interface Componente {
   vidaUtilNominal: number; // Horas de vida útil (fabricante)
   horasOperacionais: number; // Horas acumuladas desde a última troca
   equipamentoId: string; // FK do equipamento pai
+  modificado?: boolean; // Tag de modificação de projeto
   criadoEm: string; // ISO date string
   atualizadoEm: string;
 }

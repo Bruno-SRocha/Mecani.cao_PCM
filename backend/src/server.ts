@@ -24,8 +24,15 @@ import authRoutes from "./routes/auth.routes";
 import equipamentoRoutes from "./routes/equipamento.routes";
 import componenteRoutes from "./routes/componente.routes";
 import { diagnosticoEquipamentoRoutes, diagnosticoRoutes } from "./routes/diagnostico.routes";
+import ordemManutencaoRoutes, { usuariosRouter } from "./routes/ordemmanutencao.routes";
+import { reporteComponenteRouter, reporteGlobalRouter } from "./routes/reporte-substituicao.routes";
+import {
+  solicitacaoModificacaoEquipamentoRouter,
+  solicitacaoModificacaoGlobalRouter,
+} from "./routes/solicitacao-modificacao.routes";
 import { seedAdminUser } from "./config/seed";
 import { seedEquipamentos } from "./config/seed-equipamentos";
+import { seedReportes } from "./config/seed-reportes";
 
 const app = express();
 
@@ -73,6 +80,12 @@ app.use("/api/equipamentos", equipamentoRoutes);
 app.use("/api/equipamentos/:equipamentoId/componentes", componenteRoutes);
 app.use("/api/equipamentos/:equipamentoId/diagnosticos", diagnosticoEquipamentoRoutes);
 app.use("/api/diagnosticos", diagnosticoRoutes);
+app.use("/api/ordens-manutencao", ordemManutencaoRoutes);
+app.use("/api/usuarios", usuariosRouter);
+app.use("/api/equipamentos/:equipamentoId/componentes/:componenteId/reportes", reporteComponenteRouter);
+app.use("/api/reportes", reporteGlobalRouter);
+app.use("/api/equipamentos/:equipamentoId/solicitacoes-modificacao", solicitacaoModificacaoEquipamentoRouter);
+app.use("/api/solicitacoes-modificacao", solicitacaoModificacaoGlobalRouter);
 
 /* ---------------------------------------------------------------
    Inicialização: Conexão com banco + Start do servidor
@@ -96,6 +109,9 @@ AppDataSource.initialize()
     /* Cria equipamentos de demonstração se não existirem */
     await seedEquipamentos();
 
+    /* Cria usuários de teste e reportes de demonstração se não existirem */
+    await seedReportes();
+
     /* Inicia o servidor HTTP */
     app.listen(env.PORT, () => {
       console.log(`🚀 MECÂNI.CÃO PCM API rodando em http://localhost:${env.PORT}`);
@@ -106,4 +122,4 @@ AppDataSource.initialize()
   .catch((error) => {
     console.error("❌ Erro ao conectar com o banco de dados:", error);
     process.exit(1);
-  });
+  }); // Reload triggered

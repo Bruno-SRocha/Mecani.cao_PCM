@@ -65,7 +65,7 @@ export default function ComponenteFormModal({
   function desgasteLabel(pct: number) {
     if (pct >= 85) return "Crítico";
     if (pct >= 60) return "Atenção";
-    return "Normal";
+    return "Saudável";
   }
 
   /* ── Submit ───────────────────────────────────────────────── */

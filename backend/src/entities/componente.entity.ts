@@ -83,6 +83,13 @@ export class Componente {
   equipamentoId: string;
 
   /**
+   * Marcador de "Modificado" para indicar que este componente foi alterado
+   * do projeto original (e.g. substituição de tecnologia ou adição tardia).
+   */
+  @Column({ type: "boolean", default: false })
+  modificado: boolean;
+
+  /**
    * Data de criação do registro (preenchida automaticamente).
    */
   @CreateDateColumn()

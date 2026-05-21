@@ -5,33 +5,36 @@
  * Exibe o logo da marca, links de navegação com ícones,
  * informações do usuário logado e botão de logout.
  *
- * Design: fundo escuro (navy-950) com glassmorphism sutil,
- * indicador laranja no link ativo, e micro-animações de hover.
+ * Funcionalidades:
+ * - Indicador laranja no link ativo
+ * - Micro-animações de hover
+ * - Aba "Aprovações" visível apenas para GESTOR/ADMIN
+ * - Badge de notificação vermelho com contagem de pendências
  *
- * Responsivo: em mobile, a sidebar fica oculta e pode ser
- * aberta via botão hamburger no header.
+ * Design: fundo escuro (navy-950) com glassmorphism sutil.
  */
 
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Usuario } from "@/types/usuario.types";
+import { countPendentesApi } from "@/lib/api/reportes-substituicao";
 
 /**
  * Item de navegação da sidebar.
- * Define o label, href e ícone SVG path de cada link.
  */
 interface NavItem {
   label: string;
   href: string;
   iconPath: string;
+  /** Se true, o item só aparece para GESTOR e ADMIN */
+  adminOnly?: boolean;
 }
 
 /**
  * Links de navegação do menu lateral.
- * Cada entrada representa um módulo do sistema Mecâni.cão PCM.
  */
 const navItems: NavItem[] = [
   {
@@ -46,12 +49,27 @@ const navItems: NavItem[] = [
     iconPath:
       "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085",
   },
+  {
+    label: "Ordens de Manutenção",
+    href: "/ordens-manutencao",
+    iconPath:
+      "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
+  },
+  {
+    label: "Aprovações",
+    href: "/aprovacoes",
+    iconPath:
+      "M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z",
+    adminOnly: true,
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* Carrega os dados do usuário logado do localStorage */
   useEffect(() => {
@@ -64,6 +82,34 @@ export default function Sidebar() {
       }
     }
   }, []);
+
+  /**
+   * Busca e atualiza o contador de reportes pendentes.
+   * Polled a cada 30s para manter o badge atualizado.
+   */
+  useEffect(() => {
+    const nivel = usuario?.nivel;
+    if (nivel !== "ADMIN" && nivel !== "GESTOR") {
+      setPendingCount(0);
+      return;
+    }
+
+    async function fetchCount() {
+      try {
+        const count = await countPendentesApi();
+        setPendingCount(count);
+      } catch {
+        /* Silencioso — badge simplesmente não aparece */
+      }
+    }
+
+    fetchCount();
+    intervalRef.current = setInterval(fetchCount, 30_000);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [usuario?.nivel]);
 
   /**
    * Handler de logout — limpa os dados de sessão e redireciona para o login.
@@ -84,6 +130,19 @@ export default function Sidebar() {
       TECNICO: "Técnico",
     };
     return labels[nivel] ?? nivel;
+  }
+
+  const isManagerOrAdmin =
+    usuario?.nivel === "ADMIN" || usuario?.nivel === "GESTOR";
+
+  /**
+   * Formata o badge de notificação:
+   * - 1 a 99: mostra o número
+   * - >99: mostra "99+"
+   */
+  function badgeLabel(count: number): string {
+    if (count > 99) return "99+";
+    return String(count);
   }
 
   return (
@@ -133,7 +192,14 @@ export default function Sidebar() {
           ================================================================= */}
       <nav className="flex-1 px-5 py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
+          /* Esconde itens adminOnly de técnicos */
+          if (item.adminOnly && !isManagerOrAdmin) return null;
+
           const isActive = pathname.startsWith(item.href);
+          const showBadge =
+            item.href === "/aprovacoes" &&
+            isManagerOrAdmin &&
+            pendingCount > 0;
 
           return (
             <a
@@ -184,7 +250,23 @@ export default function Sidebar() {
                 />
               </svg>
 
-              <span>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
+
+              {/* Badge de notificação de pendências */}
+              {showBadge && (
+                <span
+                  className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold"
+                  style={{
+                    background: "#EF4444",
+                    color: "#FFFFFF",
+                    lineHeight: 1,
+                    boxShadow: "0 0 8px rgba(239, 68, 68, 0.5)",
+                    animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                  }}
+                >
+                  {badgeLabel(pendingCount)}
+                </span>
+              )}
             </a>
           );
         })}
