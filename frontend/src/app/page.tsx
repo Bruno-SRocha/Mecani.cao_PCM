@@ -126,7 +126,7 @@ export default function LoginPage() {
           Em telas menores (< lg), ocupa 100% da largura.
           ================================================================= */}
       <section
-        className="flex flex-1 lg:w-[40%] flex-col items-center justify-center relative px-8 py-12"
+        className="flex flex-1 lg:w-[40%] flex-col items-center justify-center relative px-space-xl py-space-3xl"
         style={{ background: "#050B18" }}
       >
         {/* Brilho sutil no topo do painel (iluminação decorativa) */}

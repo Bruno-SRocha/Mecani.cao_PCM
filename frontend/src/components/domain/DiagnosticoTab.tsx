@@ -119,7 +119,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
       </div>
 
       {diagnosticos.length === 0 ? (
-        <div className="glass-card p-10 text-center rounded-xl">
+        <div className="glass-card p-space-xl text-center rounded-xl">
           <p style={{ color: "#94A3B8" }}>Nenhum diagnóstico registrado para este equipamento.</p>
         </div>
       ) : (
@@ -131,7 +131,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
             return (
               <div key={diag.id} className="mb-8 pl-8 relative">
                 <div className="absolute w-4 h-4 rounded-full -left-[9px] top-1" style={{ background: config.cor, border: "3px solid #0B1121" }} />
-                <div className="glass-card p-5 rounded-xl border border-transparent hover:border-[rgba(255,255,255,0.05)] transition-all">
+                <div className="glass-card p-space-lg rounded-xl border border-transparent hover:border-[rgba(255,255,255,0.05)] transition-all">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
@@ -168,7 +168,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
       {/* Modal Criar/Editar */}
       {modalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
-          <div className="glass-card p-8 max-w-lg w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
+          <div className="glass-card p-space-xl max-w-lg w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
             <h3 className="text-[20px] font-bold mb-6" style={{ color: "#F1F5F9" }}>
               {editItem ? "Editar Diagnóstico" : "Novo Diagnóstico"}
             </h3>
@@ -179,11 +179,11 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] mb-1" style={{ color: "#94A3B8" }}>Data</label>
-                  <input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="w-full bg-[#0B1121] border border-[#1E293B] rounded px-3 py-2 text-white" />
+                  <input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="w-full bg-[#0B1121] border border-[#1E293B] rounded input-padding text-white" />
                 </div>
                 <div>
                   <label className="block text-[12px] mb-1" style={{ color: "#94A3B8" }}>Severidade</label>
-                  <select value={severidade} onChange={(e) => setSeveridade(e.target.value)} className="w-full bg-[#0B1121] border border-[#1E293B] rounded px-3 py-2 text-white">
+                  <select value={severidade} onChange={(e) => setSeveridade(e.target.value)} className="w-full bg-[#0B1121] border border-[#1E293B] rounded input-padding text-white">
                     <option value="BAIXA">Baixa</option>
                     <option value="MEDIA">Média</option>
                     <option value="ALTA">Alta</option>
@@ -193,7 +193,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
               </div>
               <div>
                 <label className="block text-[12px] mb-1" style={{ color: "#94A3B8" }}>Observações / Anomalia</label>
-                <textarea rows={4} value={texto} onChange={(e) => setTexto(e.target.value)} required className="w-full bg-[#0B1121] border border-[#1E293B] rounded px-3 py-2 text-white resize-none" />
+                <textarea rows={4} value={texto} onChange={(e) => setTexto(e.target.value)} required className="w-full bg-[#0B1121] border border-[#1E293B] rounded input-padding text-white resize-none" />
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 rounded text-[13px] bg-transparent text-gray-400 hover:text-white">Cancelar</button>
@@ -209,7 +209,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
       {/* Modal Auditoria (Admin) */}
       {auditModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
-          <div className="glass-card p-8 max-w-xl w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
+          <div className="glass-card p-space-xl max-w-xl w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
             <h3 className="text-[20px] font-bold mb-6" style={{ color: "#E8842C" }}>Auditoria de Alterações</h3>
             <div className="max-h-[60vh] overflow-y-auto space-y-4">
               {auditoria.length === 0 ? (

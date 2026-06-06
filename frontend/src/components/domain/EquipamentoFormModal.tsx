@@ -51,14 +51,14 @@ export default function EquipamentoFormModal({ equipamento, onClose, onSaved }: 
     }
   }
 
-  const inputCls = "w-full px-4 py-3 rounded-lg text-[14px] outline-none transition-all duration-200";
+  const inputCls = "w-full input-padding rounded-lg text-[14px] outline-none transition-all duration-200";
   const inputStyle: React.CSSProperties = { background: "rgba(12, 20, 38, 0.65)", border: "1px solid rgba(100, 116, 139, 0.2)", color: "#F1F5F9" };
   const labelCls = "block text-[11px] font-semibold tracking-[0.15em] uppercase mb-2.5";
   const labelStyle: React.CSSProperties = { color: "#94A3B8" };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div className="glass-card p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-fade-in-up" style={{ background: "#111D35", animationDuration: "0.3s" }} onClick={e => e.stopPropagation()}>
+      <div className="glass-card p-space-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-fade-in-up" style={{ background: "#111D35", animationDuration: "0.3s" }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

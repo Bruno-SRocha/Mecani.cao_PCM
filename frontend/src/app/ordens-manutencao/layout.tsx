@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 
 export default function OrdensManutencaoLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen" style={{ background: "#0C1322" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)" }}>
       <Sidebar />
-      <main className="flex-1 min-h-screen overflow-x-hidden w-full" style={{ background: "#0C1322" }}>
+      <main className="flex-1 min-h-screen overflow-x-hidden w-full" style={{ background: "var(--bg-primary)" }}>
         {children}
       </main>
     </div>

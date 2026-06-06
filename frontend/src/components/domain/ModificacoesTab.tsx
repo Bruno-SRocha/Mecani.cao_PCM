@@ -175,11 +175,11 @@ export default function ModificacoesTab({
       </div>
 
       {loading ? (
-        <div className="p-8 text-center" style={{ color: "#94A3B8" }}>
+        <div className="p-space-xl text-center" style={{ color: "#94A3B8" }}>
           Carregando histórico de modificações...
         </div>
       ) : solicitacoes.length === 0 ? (
-        <div className="glass-card p-12 text-center rounded-2xl flex flex-col items-center">
+        <div className="glass-card p-space-2xl text-center rounded-2xl flex flex-col items-center">
           <svg className="w-12 h-12 mb-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -195,10 +195,10 @@ export default function ModificacoesTab({
             return (
               <div
                 key={sol.id}
-                className="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col gap-5 hover:border-slate-700 transition-all animate-fade-in-up"
+                className="glass-card p-space-lg rounded-2xl border border-slate-800 flex flex-col gap-5 hover:border-slate-700 transition-all animate-fade-in-up"
               >
                 {/* Header da Solicitação */}
-                <div className="flex justify-between items-start border-b border-slate-800/60 pb-4">
+                <div className="flex justify-between items-start border-b border-slate-800/60 pb-space-md">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
                       <span
@@ -243,7 +243,7 @@ export default function ModificacoesTab({
                 {/* Workflow de Comparação "Antes" vs "Depois" (AC1 & UI/UX spec) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* ANTES */}
-                  <div className="bg-[#0B1121]/50 p-4 rounded-xl border border-slate-900 flex flex-col gap-2">
+                  <div className="bg-[#0B1121]/50 p-space-md rounded-xl border border-slate-900 flex flex-col gap-2">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                       Antes (BOM Original)
                     </p>
@@ -272,7 +272,7 @@ export default function ModificacoesTab({
                   </div>
 
                   {/* DEPOIS */}
-                  <div className="bg-[#0B1121]/50 p-4 rounded-xl border border-slate-900 flex flex-col gap-2">
+                  <div className="bg-[#0B1121]/50 p-space-md rounded-xl border border-slate-900 flex flex-col gap-2">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#22A0B4]">
                       Depois (BOM Proposta)
                     </p>
@@ -322,7 +322,7 @@ export default function ModificacoesTab({
                 </div>
 
                 {/* Justificativa Técnica (AC2) */}
-                <div className="bg-[#0B1121]/30 p-4 rounded-xl border border-slate-900/60">
+                <div className="bg-[#0B1121]/30 p-space-md rounded-xl border border-slate-900/60">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
                     Justificativa da Modificação (Técnico)
                   </p>
@@ -333,7 +333,7 @@ export default function ModificacoesTab({
 
                 {/* Parecer da Engenharia */}
                 {(sol.parecerEngenharia || sol.status === "CONCLUIDO") && (
-                  <div className="bg-teal-950/10 p-4 rounded-xl border border-teal-900/30">
+                  <div className="bg-teal-950/10 p-space-md rounded-xl border border-teal-900/30">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#22A0B4] mb-2 flex items-center gap-1.5">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 5.636 3.745 3.745 0 0 1-7.1 0 3.745 3.745 0 0 1-1.087-5.636A9 9 0 1 1 21 12Z" />
@@ -359,7 +359,7 @@ export default function ModificacoesTab({
       {/* MODAL: Solicitar Modificação */}
       {modalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
-          <div className="glass-card p-8 max-w-4xl w-full mx-4 rounded-2xl flex flex-col md:flex-row gap-6 max-h-[90vh] overflow-y-auto" style={{ background: "#111D35" }}>
+          <div className="glass-card p-space-xl max-w-4xl w-full mx-4 rounded-2xl flex flex-col md:flex-row gap-6 max-h-[90vh] overflow-y-auto" style={{ background: "#111D35" }}>
             
             {/* Esquerda: Form */}
             <div className="flex-1 space-y-5">
@@ -403,7 +403,7 @@ export default function ModificacoesTab({
                     <select
                       value={componenteSaidaId}
                       onChange={(e) => setComponenteSaidaId(e.target.value)}
-                      className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px] focus:outline-none focus:border-[#1A7A8A]"
+                      className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px] focus:outline-none focus:border-[#1A7A8A]"
                     >
                       {componentes.map((c) => (
                         <option key={c.id} value={c.id}>
@@ -416,8 +416,8 @@ export default function ModificacoesTab({
 
                 {/* Detalhes do Novo Componente (se Adição ou Substituição) */}
                 {tipoModificacao !== "REMOCAO" && (
-                  <div className="space-y-3 p-4 bg-[#0B1121]/45 rounded-xl border border-slate-900">
-                    <p className="text-[11px] font-bold text-[#22A0B4] uppercase tracking-wider">Novo Componente a ser Instalado</p>
+                  <div className="space-y-3 p-space-md bg-[#0B1121]/45 rounded-xl border border-slate-900">
+                    <p className="text-[11px] font-bold text-[#22A0B4] uppercase tracking-wider">Novo Componente a ser Installed</p>
                     
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -428,7 +428,7 @@ export default function ModificacoesTab({
                           onChange={(e) => setNovoComponenteNome(e.target.value)}
                           placeholder="Ex: Selo John Crane T1"
                           required
-                          className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px]"
+                          className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px]"
                         />
                       </div>
                       <div>
@@ -436,7 +436,7 @@ export default function ModificacoesTab({
                         <select
                           value={novoComponenteTipo}
                           onChange={(e) => setNovoComponenteTipo(e.target.value)}
-                          className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px]"
+                          className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px]"
                         >
                           <option value="selo_mecanico">Selo Mecânico</option>
                           <option value="rolamento">Rolamento</option>
@@ -456,7 +456,7 @@ export default function ModificacoesTab({
                         onChange={(e) => setNovoComponenteVidaUtilNominal(Number(e.target.value))}
                         required
                         min={100}
-                        className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px]"
+                        className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px]"
                       />
                     </div>
                   </div>
@@ -471,7 +471,7 @@ export default function ModificacoesTab({
                     onChange={(e) => setJustificativa(e.target.value)}
                     required
                     placeholder="Ex: Substituição de gaxetas convencionais por selo mecânico John Crane para mitigar vazamentos constantes e aumentar vida útil operacional do ativo."
-                    className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px] resize-none focus:outline-none focus:border-[#1A7A8A]"
+                    className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px] resize-none focus:outline-none focus:border-[#1A7A8A]"
                   />
                 </div>
 
@@ -501,7 +501,7 @@ export default function ModificacoesTab({
               
               <div className="flex flex-col gap-3">
                 {/* ANTES CARD */}
-                <div className="bg-[#0B1121] p-4 rounded-xl border border-slate-800">
+                <div className="bg-[#0B1121] p-space-md rounded-xl border border-slate-800">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-2">Estado Original</p>
                   {tipoModificacao === "ADICAO" ? (
                     <p className="text-[12px] text-slate-500 italic">[ Nenhum ]</p>
@@ -516,7 +516,7 @@ export default function ModificacoesTab({
                 </div>
 
                 {/* DEPOIS CARD */}
-                <div className="bg-[#0B1121] p-4 rounded-xl border border-[#22A0B4]/40" style={{ boxShadow: "0 0 12px rgba(34, 160, 180, 0.05)" }}>
+                <div className="bg-[#0B1121] p-space-md rounded-xl border border-[#22A0B4]/40" style={{ boxShadow: "0 0 12px rgba(34, 160, 180, 0.05)" }}>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-[#22A0B4] mb-2">Estado Proposto</p>
                   {tipoModificacao === "REMOCAO" ? (
                     <p className="text-[12px] text-red-400 font-medium">❌ Componente será excluído da BOM</p>
@@ -542,7 +542,7 @@ export default function ModificacoesTab({
       {/* MODAL: Concluir Modificação (Inserir Parecer da Engenharia) */}
       {parecerOpenId && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
-          <div className="glass-card p-6 max-w-md w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
+          <div className="glass-card p-space-lg max-w-md w-full mx-4 rounded-xl" style={{ background: "#111D35" }}>
             <h3 className="text-[18px] font-bold mb-2 text-white">Homologação da Engenharia</h3>
             <p className="text-[12px] text-slate-400 mb-4">
               Escreva o parecer técnico que ficará documentado no histórico de modificações do ativo.
@@ -555,7 +555,7 @@ export default function ModificacoesTab({
               value={parecerTexto}
               onChange={(e) => setParecerTexto(e.target.value)}
               placeholder="Ex: Homologado. Novo selo mecânico instalado com sucesso, garantindo melhor vedação sob alta pressão e aumentando consideravelmente a confiabilidade operacional."
-              className="w-full bg-[#0B1121] border border-slate-800 rounded-lg px-3 py-2 text-white text-[13px] resize-none focus:outline-none focus:border-[#1a7a8a] mb-5"
+              className="w-full bg-[#0B1121] border border-slate-800 rounded-lg input-padding text-white text-[13px] resize-none focus:outline-none focus:border-[#1a7a8a] mb-5"
             />
 
             <div className="flex justify-end gap-3">

@@ -21,6 +21,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import type { Usuario } from "@/types/usuario.types";
 import { countPendentesApi } from "@/lib/api/reportes-substituicao";
+import { useTheme } from "@/components/ThemeProvider";
 
 /**
  * Item de navegação da sidebar.
@@ -70,6 +71,7 @@ export default function Sidebar() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   /* Carrega os dados do usuário logado do localStorage */
   useEffect(() => {
@@ -147,50 +149,73 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="sticky top-0 h-screen w-[260px] shrink-0 flex flex-col z-50"
+      className="sticky top-0 h-screen w-[280px] shrink-0 flex flex-col z-50 transition-all duration-200"
       style={{
-        background: "linear-gradient(180deg, #070E1B 0%, #0A1428 100%)",
-        borderRight: "1px solid rgba(148, 163, 184, 0.08)",
+        background: "var(--bg-glass)",
+        backdropFilter: "blur(16px) saturate(180%)",
+        borderRight: "1px solid var(--border-subtle)",
       }}
     >
       {/* =================================================================
-          Logo da marca — topo da sidebar
+          Logo da marca — topo da sidebar + Seletor de Tema (CA01)
           ================================================================= */}
-      <div className="flex items-center gap-3 px-6 py-6 border-b"
-        style={{ borderColor: "rgba(148, 163, 184, 0.08)" }}
+      <div className="flex items-center justify-between px-5 py-5 border-b"
+        style={{ borderColor: "var(--border-subtle)" }}
       >
-        <Image
-          src="/icon.png"
-          alt="Ícone"
-          width={32}
-          height={32}
-          priority
-        />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Image
-            src="/logo.png"
-            alt="MECÂNI.CÃO PCM"
-            width={120}
-            height={30}
+            src="/icon.png"
+            alt="Ícone"
+            width={32}
+            height={32}
             priority
           />
-          <span
-            className="px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase"
-            style={{
-              background: "rgba(232, 132, 44, 0.12)",
-              color: "#E8842C",
-              border: "1px solid rgba(232, 132, 44, 0.25)",
-            }}
-          >
-            PCM
-          </span>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo.png"
+              alt="MECÂNI.CÃO PCM"
+              width={118}
+              height={29}
+              priority
+            />
+            <span
+              className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase"
+              style={{
+                background: "rgba(232, 132, 44, 0.12)",
+                color: "#E8842C",
+                border: "1px solid rgba(232, 132, 44, 0.25)",
+              }}
+            >
+              PCM
+            </span>
+          </div>
         </div>
+
+        {/* Botão Seletor de Tema (CA01) */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg hover:bg-[rgba(148,163,184,0.08)] text-txt-secondary hover:text-txt-primary transition-all duration-200 cursor-pointer flex items-center justify-center shrink-0"
+          aria-label="Alternar tema"
+          title={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+        >
+          {theme === "dark" ? (
+            /* Sun Icon (Modo Claro) */
+            <svg className="w-5 h-5 text-[#E8842C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.93 4.93l1.59 1.59m10.96 10.96l1.59 1.59M3 12h2.25m13.5 0H21M4.93 19.07l1.59-1.59m10.96-10.96l1.59-1.59M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" />
+            </svg>
+          ) : (
+            /* Moon Icon (Modo Escuro) */
+            <svg className="w-5 h-5 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* =================================================================
           Links de navegação
           ================================================================= */}
-      <nav className="flex-1 px-5 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-3 py-5 flex flex-col gap-1.5 overflow-y-auto">
         {navItems.map((item) => {
           /* Esconde itens adminOnly de técnicos */
           if (item.adminOnly && !isManagerOrAdmin) return null;
@@ -205,38 +230,38 @@ export default function Sidebar() {
             <a
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-[14px] font-medium transition-all duration-200 relative group"
+              className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-medium transition-all duration-200 relative group min-h-[48px]"
               style={{
-                color: isActive ? "#F1F5F9" : "#64748B",
+                color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
                 background: isActive
-                  ? "rgba(232, 132, 44, 0.08)"
+                  ? "rgba(232, 132, 44, 0.10)"
                   : "transparent",
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background =
-                    "rgba(148, 163, 184, 0.06)";
-                  e.currentTarget.style.color = "#94A3B8";
+                    "rgba(148, 163, 184, 0.07)";
+                  e.currentTarget.style.color = "var(--text-primary)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#64748B";
+                  e.currentTarget.style.color = "var(--text-secondary)";
                 }
               }}
             >
               {/* Indicador laranja do link ativo */}
               {isActive && (
                 <div
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full"
                   style={{ background: "#E8842C" }}
                 />
               )}
 
               {/* Ícone do módulo */}
               <svg
-                className="w-5 h-5 shrink-0"
+                className="w-[22px] h-[22px] shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -250,12 +275,12 @@ export default function Sidebar() {
                 />
               </svg>
 
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1 leading-tight">{item.label}</span>
 
               {/* Badge de notificação de pendências */}
               {showBadge && (
                 <span
-                  className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold"
+                  className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-bold shrink-0"
                   style={{
                     background: "#EF4444",
                     color: "#FFFFFF",
@@ -276,15 +301,17 @@ export default function Sidebar() {
           Área do usuário — parte inferior da sidebar
           ================================================================= */}
       <div
-        className="px-5 py-5 border-t"
-        style={{ borderColor: "rgba(148, 163, 184, 0.08)" }}
+        className="px-3 py-4 border-t"
+        style={{ borderColor: "var(--border-subtle)" }}
       >
         {/* Info do usuário logado */}
         {usuario && (
-          <div className="flex items-center gap-3 mb-3 px-2">
+          <div className="flex items-center gap-3 mb-3 px-3 py-3 rounded-xl"
+            style={{ background: "rgba(148, 163, 184, 0.04)" }}
+          >
             {/* Avatar com inicial do nome */}
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold shrink-0"
               style={{
                 background: "rgba(232, 132, 44, 0.15)",
                 color: "#E8842C",
@@ -294,14 +321,14 @@ export default function Sidebar() {
             </div>
             <div className="min-w-0">
               <p
-                className="text-[13px] font-semibold truncate"
-                style={{ color: "#F1F5F9" }}
+                className="text-[14px] font-semibold truncate"
+                style={{ color: "var(--text-primary)" }}
               >
                 {usuario.nome}
               </p>
               <p
-                className="text-[11px] tracking-wide"
-                style={{ color: "#64748B" }}
+                className="text-[12px] tracking-wide mt-0.5"
+                style={{ color: "var(--text-secondary)" }}
               >
                 {getNivelLabel(usuario.nivel)}
               </p>
@@ -312,19 +339,19 @@ export default function Sidebar() {
         {/* Botão de logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 w-full px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 cursor-pointer"
-          style={{ color: "#64748B" }}
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-[14px] font-medium transition-all duration-200 cursor-pointer min-h-[44px]"
+          style={{ color: "var(--text-secondary)" }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)";
             e.currentTarget.style.color = "#FCA5A5";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = "#64748B";
+            e.currentTarget.style.color = "var(--text-secondary)";
           }}
         >
           <svg
-            className="w-4.5 h-4.5"
+            className="w-5 h-5 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

@@ -112,20 +112,20 @@ export const STATUS_OM_LABELS: Record<StatusOM, string> = {
  * Cores associadas a cada status (para badges/indicadores visuais).
  */
 export const STATUS_OM_COLORS: Record<StatusOM, string> = {
-  ABERTA: "#22A0B4",
-  AGUARDANDO_INICIO: "#FBBF24",
-  EM_EXECUCAO: "#4ADE80",
-  PAUSADA: "#94A3B8",
-  CONCLUIDA: "#4ADE80",
-  CANCELADA: "#F87171",
+  ABERTA: "var(--cyan-badge)",
+  AGUARDANDO_INICIO: "var(--yellow-badge)",
+  EM_EXECUCAO: "var(--green-badge)",
+  PAUSADA: "var(--text-secondary)",
+  CONCLUIDA: "var(--green-badge)",
+  CANCELADA: "var(--red-badge)",
 };
 
 /**
  * Cores associadas a cada prioridade.
  */
 export const PRIORIDADE_COLORS: Record<PrioridadeOM, string> = {
-  BAIXA: "#4ADE80",
-  MEDIA: "#FBBF24",
-  ALTA: "#F97316",
-  CRITICA: "#F87171",
+  BAIXA: "var(--green-badge)",
+  MEDIA: "var(--yellow-badge)",
+  ALTA: "var(--orange)",
+  CRITICA: "var(--red-badge)",
 };

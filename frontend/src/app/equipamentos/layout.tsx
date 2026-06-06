@@ -25,14 +25,14 @@ export default function EquipamentosLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen" style={{ background: "#0C1322" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)" }}>
       {/* Sidebar — menu lateral fixo */}
       <Sidebar />
 
       {/* Área de conteúdo principal — offset pela largura da sidebar */}
       <main
         className="flex-1 min-h-screen overflow-x-hidden w-full"
-        style={{ background: "#0C1322" }}
+        style={{ background: "var(--bg-primary)" }}
       >
         {children}
       </main>

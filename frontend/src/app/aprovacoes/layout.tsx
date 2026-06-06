@@ -12,11 +12,11 @@ export default function AprovacoesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen" style={{ background: "#0C1322" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)" }}>
       <Sidebar />
       <main
         className="flex-1 min-h-screen overflow-x-hidden w-full"
-        style={{ background: "#0C1322" }}
+        style={{ background: "var(--bg-primary)" }}
       >
         {children}
       </main>

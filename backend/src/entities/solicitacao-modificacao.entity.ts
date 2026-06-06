@@ -44,14 +44,14 @@ export class SolicitacaoModificacao {
   justificativa: string;
 
   @Column({ type: "varchar", nullable: true })
-  componenteSaidaId: string;
+  componenteSaidaId: string | null;
 
   @ManyToOne(() => Componente, { onDelete: "SET NULL", nullable: true, eager: true })
   @JoinColumn({ name: "componenteSaidaId" })
   componenteSaida: Componente | null;
 
   @Column({ type: "varchar", nullable: true })
-  componenteEntradaId: string;
+  componenteEntradaId: string | null;
 
   @ManyToOne(() => Componente, { onDelete: "SET NULL", nullable: true, eager: true })
   @JoinColumn({ name: "componenteEntradaId" })

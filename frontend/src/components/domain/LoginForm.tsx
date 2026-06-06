@@ -101,9 +101,9 @@ export default function LoginForm() {
       {/* =================================================================
           Cabeçalho — "ACESSO AO SISTEMA" com barra laranja
           ================================================================= */}
-      <div className="mb-8">
+      <div className="mb-space-xl">
         {/* Barra laranja + rótulo (como na imagem de referência) */}
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center gap-3 mb-space-lg">
           {/* Barra horizontal laranja */}
           <div
             className="w-6 h-[3px] rounded-full"
@@ -119,7 +119,7 @@ export default function LoginForm() {
 
         {/* Título principal */}
         <h1
-          className="text-[32px] font-bold leading-tight tracking-tight mb-3"
+          className="text-[32px] font-bold leading-tight tracking-tight mb-space-sm"
           style={{ color: "#F1F5F9" }}
         >
           Bem-vindo de volta
@@ -139,7 +139,7 @@ export default function LoginForm() {
           ================================================================= */}
       {erro && (
         <div
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm mb-6 animate-fade-in"
+          className="flex items-center gap-3 px-space-md py-space-sm rounded-lg text-sm mb-space-lg animate-fade-in"
           style={{
             background: "rgba(239, 68, 68, 0.08)",
             border: "1px solid rgba(239, 68, 68, 0.2)",
@@ -158,7 +158,7 @@ export default function LoginForm() {
       {/* =================================================================
           Campos do formulário
           ================================================================= */}
-      <div className="space-y-5 mb-5">
+      <div className="space-y-space-lg mb-space-lg">
 
         {/* ---------------------------------------------------------------
             Campo: Usuário
@@ -167,7 +167,7 @@ export default function LoginForm() {
         <div>
           <label
             htmlFor="login-username"
-            className="block text-[11px] font-semibold tracking-[0.2em] uppercase mb-2.5"
+            className="block text-[11px] font-semibold tracking-[0.2em] uppercase mb-space-xs"
             style={{ color: "#94A3B8" }}
           >
             Usuário
@@ -180,7 +180,7 @@ export default function LoginForm() {
             placeholder="Digite seu usuário"
             autoComplete="username"
             disabled={carregando}
-            className="w-full px-5 py-4 rounded-lg text-[15px] outline-none transition-all duration-200
+            className="w-full input-padding rounded-lg text-[15px] outline-none transition-all duration-200
               disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#4A5568]"
             style={inputStyle}
             onFocus={inputFocusHandler}
@@ -194,7 +194,7 @@ export default function LoginForm() {
         <div>
           <label
             htmlFor="login-password"
-            className="block text-[11px] font-semibold tracking-[0.2em] uppercase mb-2.5"
+            className="block text-[11px] font-semibold tracking-[0.2em] uppercase mb-space-xs"
             style={{ color: "#94A3B8" }}
           >
             Senha
@@ -208,7 +208,7 @@ export default function LoginForm() {
               placeholder="Digite sua senha"
               autoComplete="current-password"
               disabled={carregando}
-              className="w-full px-5 py-4 pr-14 rounded-lg text-[15px] outline-none transition-all duration-200
+              className="w-full input-padding pr-14 rounded-lg text-[15px] outline-none transition-all duration-200
                 disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[#4A5568]"
               style={inputStyle}
               onFocus={inputFocusHandler}
@@ -293,7 +293,7 @@ export default function LoginForm() {
         id="login-submit-btn"
         type="submit"
         disabled={carregando}
-        className="w-full py-4 rounded-lg text-[15px] font-bold text-white cursor-pointer
+        className="w-full py-space-md rounded-lg text-[15px] font-bold text-white cursor-pointer
           flex items-center justify-center gap-2.5
           transition-all duration-300 ease-out
           disabled:opacity-50 disabled:cursor-not-allowed"

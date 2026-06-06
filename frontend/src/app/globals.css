@@ -32,21 +32,39 @@
   --teal-light: #22A0B4;
   --teal-dark: #135B67;
 
-  /* Superfícies e fundos */
+  /* Superfícies e fundos base */
   --bg-primary: #0C1322;
   --bg-secondary: #111D35;
   --bg-card: rgba(27, 42, 74, 0.45);
   --bg-card-hover: rgba(27, 42, 74, 0.65);
   --bg-glass: rgba(17, 29, 53, 0.7);
 
+  /*
+   * Hierarquia semântica de superfícies por categoria (Dark Mode)
+   *
+   * Filosofia de profundidade:
+   *   Inputs/busca  → mais ESCUROS que o fundo  = efeito "sunken" (afundado)
+   *   Sub-cards     → entre fundo e glass-card  = leve elevação interna
+   *   Filter chips  → transparência mínima       = apenas textura de botão
+   *   Selects       → mesma lógica dos inputs    = controles de formulário
+   */
+  --bg-input:               #060D1A;                   /* Barras de busca — efeito sunken */
+  --bg-select:              #070F1E;                   /* Selects/dropdowns — levemente quente */
+  --bg-sub-card:            rgba(6, 13, 28, 0.72);     /* Info-cards dentro de glass-cards */
+  --bg-filter-chip:         rgba(255, 255, 255, 0.03); /* Chips de filtro inativos */
+  --bg-filter-chip-active:  rgba(232, 132, 44, 0.14);  /* Chips ativos — laranja da marca */
+
   /* Texto */
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
 
-  /* Bordas */
-  --border-subtle: rgba(148, 163, 184, 0.12);
-  --border-accent: rgba(232, 132, 44, 0.3);
+  /* Bordas por categoria */
+  --border-subtle:       rgba(148, 163, 184, 0.12);
+  --border-input:        rgba(148, 163, 184, 0.16);  /* Inputs — mais visível */
+  --border-sub-card:     rgba(148, 163, 184, 0.08);  /* Sub-cards — sutil (contexto aninhado) */
+  --border-filter-chip:  rgba(148, 163, 184, 0.10);  /* Chips inativos */
+  --border-accent:       rgba(232, 132, 44, 0.3);
 
   /* Sombras */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -64,6 +82,47 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Espaçamentos e Padding (Design System) */
+  --space-xs: 0.5rem;    /* 8px */
+  --space-sm: 0.75rem;   /* 12px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 2.5rem;   /* 40px */
+  --space-3xl: 3rem;     /* 48px */
+
+  --input-padding-y: 0.625rem;   /* 10px */
+  --input-padding-x: 0.875rem;   /* 14px */
+  --input-padding-icon: 2.75rem; /* 44px — espaço para ícone de busca */
+
+  /* Tipografia — tamanhos mínimos acessíveis */
+  --text-label:    0.6875rem;  /* 11px — labels uppercase/tracking */
+  --text-caption:  0.75rem;   /* 12px — textos secundários mínimos */
+  --text-body-sm:  0.8125rem; /* 13px — corpo pequeno */
+  --text-body:     0.875rem;  /* 14px — corpo padrão */
+  --text-body-lg:  0.9375rem; /* 15px — corpo destacado */
+  --text-subtitle: 1rem;      /* 16px — subtítulo */
+  --text-title-sm: 1.125rem;  /* 18px — título pequeno */
+  --text-title:    1.75rem;   /* 28px — título de seção */
+  --text-heading:  2rem;      /* 32px — heading de página */
+
+  /* Badges - Dark Mode */
+  --yellow-badge: #FBBF24;
+  --yellow-badge-bg: rgba(251, 191, 36, 0.08);
+  --yellow-badge-border: rgba(251, 191, 36, 0.25);
+
+  --green-badge: #4ADE80;
+  --green-badge-bg: rgba(74, 222, 128, 0.08);
+  --green-badge-border: rgba(74, 222, 128, 0.25);
+
+  --red-badge: #F87171;
+  --red-badge-bg: rgba(248, 113, 113, 0.08);
+  --red-badge-border: rgba(248, 113, 113, 0.25);
+
+  --cyan-badge: #22A0B4;
+  --cyan-badge-bg: rgba(34, 160, 180, 0.1);
+  --cyan-badge-border: rgba(34, 160, 180, 0.25);
 }
 
 /* ---------------------------------------------------------------
@@ -92,31 +151,39 @@
   --color-txt-muted: var(--text-muted);
 
   --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Spacing Tokens */
+  --spacing-space-xs: var(--space-xs);
+  --spacing-space-sm: var(--space-sm);
+  --spacing-space-md: var(--space-md);
+  --spacing-space-lg: var(--space-lg);
+  --spacing-space-xl: var(--space-xl);
+  --spacing-space-2xl: var(--space-2xl);
+  --spacing-space-3xl: var(--space-3xl);
 }
 
-/* ---------------------------------------------------------------
-   Reset e estilos base
-   --------------------------------------------------------------- */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  font-family: var(--font-sans);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 }
 
 /* ---------------------------------------------------------------
@@ -262,3 +329,317 @@ body {
   background: var(--orange);
   color: white;
 }
+
+/* ---------------------------------------------------------------
+   Utilitários de Espaçamento e Layout (Design System)
+   --------------------------------------------------------------- */
+.page-container {
+  width: 100%;
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
+
+.card-padding {
+  padding: var(--space-lg);
+}
+
+.kpi-padding {
+  padding: var(--space-lg);
+}
+
+.input-padding {
+  padding: var(--input-padding-y) var(--input-padding-x);
+}
+
+/* ---------------------------------------------------------------
+   Barra de Busca com ícone — corrige sobreposição do placeholder
+   --------------------------------------------------------------- */
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper .search-icon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.125rem;  /* 18px */
+  height: 1.125rem;
+  pointer-events: none;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  padding-left: var(--input-padding-icon);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(232, 132, 44, 0.08);
+}
+
+/* ---------------------------------------------------------------
+   Select / Dropdown de formulário
+   Aparencia consistente com inputs em todas as páginas.
+   --------------------------------------------------------------- */
+.form-select {
+  background: var(--bg-select);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  padding: var(--input-padding-y) var(--input-padding-x);
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.form-select:focus {
+  border-color: var(--orange);
+}
+
+/* ---------------------------------------------------------------
+   Chips de filtro — botões de filtragem de status
+   Padrão visual consistente em todas as páginas.
+   --------------------------------------------------------------- */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--border-filter-chip);
+  background: var(--bg-filter-chip);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  background: rgba(148, 163, 184, 0.06);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.filter-chip.active {
+  background: var(--bg-filter-chip-active);
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+/* ---------------------------------------------------------------
+   Sub-cards de informação — info-cards dentro de glass-cards
+   Cor ligeiramente diferente do card pai para criar profundidade.
+   --------------------------------------------------------------- */
+.info-sub-card {
+  background: var(--bg-sub-card);
+  border: 1px solid var(--border-sub-card);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem; /* 16px 20px — respiro suficiente para o texto não tocar bordas */
+}
+
+/* ---------------------------------------------------------------
+   Seções internas de card — separa blocos dentro de um glass-card
+   com padding horizontal consistente.
+   --------------------------------------------------------------- */
+.card-section {
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* ---------------------------------------------------------------
+   Lista de itens — espaçamento adequado entre cards
+   --------------------------------------------------------------- */
+.list-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md); /* 16px — espaço confortável entre cards */
+}
+
+.list-items-lg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg); /* 24px — para cards mais complexos */
+}
+
+/* ---------------------------------------------------------------
+   Tema Claro (Light Mode) — WCAG Compliant
+   --------------------------------------------------------------- */
+.light {
+  /* Superfícies e fundos */
+  --bg-primary: #F1F5F9;       /* Slate 100 — Fundo geral da página */
+  --bg-secondary: #FFFFFF;     /* Branco — Fundo de sidebar/panels */
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-hover: rgba(255, 255, 255, 0.98);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+
+  /*
+   * Hierarquia semântica — Light Mode
+   *   - Inputs/busca: azul-cinza ligeiramente mais escuro que o fundo da página
+   *   - Sub-cards: entre o fundo da página e o branco puro (surface)
+   *   - Filter chips: nuance azul muito sutil
+   */
+  --bg-input:      #DDE5F0;                 /* Barras de busca — azul-cinza mais escuro */
+  --bg-select:     #E0E8F2;                 /* Selects — levemente mais quente */
+  --bg-sub-card:   #EBF0FA;                 /* Info sub-cards — azul esfumado suave */
+  --bg-filter-chip: rgba(15,23,42,0.04);   /* Chips inativos — sutil navy translucido */
+  --bg-filter-chip-active: rgba(232,132,44,0.10); /* Chips ativos */
+
+  /* Bordas por categoria */
+  --border-input:  rgba(15, 23, 42, 0.16); /* Mais visível no modo claro */
+  --border-sub-card: rgba(15, 23, 42, 0.07);
+  --border-filter-chip: rgba(15, 23, 42, 0.10);
+
+  /* Texto — Cores com excelente taxa de contraste (WCAG AAA/AA) */
+  --text-primary: #0F172A;     /* Slate 900 */
+  --text-secondary: #334155;   /* Slate 800 */
+  --text-muted: #475569;       /* Slate 600 */
+
+  /* Bordas */
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-accent: rgba(232, 132, 44, 0.45);
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 24px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 20px rgba(232, 132, 44, 0.12);
+
+  /* Badges - Light Mode (High Contrast WCAG AAA/AA) */
+  --yellow-badge: #854D0E;
+  --yellow-badge-bg: rgba(234, 179, 8, 0.15);
+  --yellow-badge-border: rgba(234, 179, 8, 0.4);
+
+  --green-badge: #166534;
+  --green-badge-bg: rgba(34, 197, 94, 0.15);
+  --green-badge-border: rgba(34, 197, 94, 0.4);
+
+  --red-badge: #991B1B;
+  --red-badge-bg: rgba(239, 68, 68, 0.12);
+  --red-badge-border: rgba(239, 68, 68, 0.35);
+
+  --cyan-badge: #155E75;
+  --cyan-badge-bg: rgba(6, 182, 212, 0.15);
+  --cyan-badge-border: rgba(6, 182, 212, 0.4);
+}
+
+/* Redefine scrollbars no modo claro */
+.light ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #CBD5E1; /* Slate 300 */
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: var(--teal-light);
+}
+
+/* ---------------------------------------------------------------
+   Ajustes de Legibilidade e Contraste para Tema Claro (WCAG)
+   Substitui as cores inline hardcodadas do tema escuro
+   --------------------------------------------------------------- */
+.light [style*="color: #F1F5F9"],
+.light [style*="color: rgb(241, 245, 249)"] {
+  color: var(--text-primary) !important;
+}
+
+.light [style*="color: #64748B"],
+.light [style*="color: rgb(100, 116, 139)"] {
+  color: var(--text-secondary) !important;
+}
+
+.light [style*="color: #94A3B8"],
+.light [style*="color: rgb(148, 163, 184)"] {
+  color: var(--text-secondary) !important;
+}
+
+.light [style*="color: #475569"],
+.light [style*="color: rgb(71, 85, 105)"] {
+  color: var(--text-muted) !important;
+}
+
+/* Inputs, selects e textareas — usam tokens semânticos por categoria */
+.light input:not([type="checkbox"]):not([type="radio"]),
+.light textarea {
+  background: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-input) !important;
+}
+
+.light select {
+  background: var(--bg-select) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-input) !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Inputs/Selects com inline styles hardcodados no tema antigo */
+.light [style*="background: rgba(15, 23, 42, 0.6)"],
+.light [style*="background-color: rgba(15, 23, 42, 0.6)"],
+.light [style*="background:rgba(15,23,42,0.6)"],
+.light [style*="background-color:rgba(15,23,42,0.6)"] {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+/* Modais e painéis de confirmação com fundos hardcodados escuros */
+.light [style*="background: #0F1C32"],
+.light [style*="background: rgb(15, 28, 50)"],
+.light [style*="background:#0F1C32"],
+.light [style*="background: #0f1c32"],
+.light [style*="background:#0f1c32"] {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.light [style*="background: rgba(7, 14, 27, 0.85)"],
+.light [style*="background:rgba(7,14,27,0.85)"] {
+  background: rgba(241, 245, 249, 0.75) !important;
+}
+
+/* Overrides para os botões de Cancelar nos modais */
+.light [style*="background: rgba(148, 163, 184, 0.06)"],
+.light [style*="background:rgba(148,163,184,0.06)"] {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+.light [style*="color: #334155"],
+.light [style*="color: rgb(51, 65, 85)"] {
+  color: var(--text-muted) !important;
+}
+

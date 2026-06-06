@@ -73,7 +73,7 @@ export default function ReporteSubstituicaoModal({
 
   /* ── Estilos reutilizáveis ────────────────────────────────── */
   const inputCls =
-    "w-full px-4 py-3 rounded-lg text-[14px] outline-none transition-all duration-200";
+    "w-full input-padding rounded-lg text-[14px] outline-none transition-all duration-200";
   const inputStyle: React.CSSProperties = {
     background: "rgba(12, 20, 38, 0.65)",
     border: "1px solid rgba(100, 116, 139, 0.2)",
@@ -95,7 +95,7 @@ export default function ReporteSubstituicaoModal({
       onClick={onClose}
     >
       <div
-        className="glass-card p-8 max-w-xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-fade-in-up"
+        className="glass-card p-space-xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-fade-in-up"
         style={{ background: "#0F1A2E", animationDuration: "0.25s" }}
         onClick={(e) => e.stopPropagation()}
       >

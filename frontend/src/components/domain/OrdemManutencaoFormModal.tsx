@@ -27,26 +27,26 @@ interface Props {
 }
 
 const TIPOS: { value: TipoManutencao; label: string; color: string }[] = [
-  { value: "PREVENTIVA", label: "Preventiva", color: "#22A0B4" },
-  { value: "CORRETIVA_PROGRAMADA", label: "Corretiva Programada", color: "#FBBF24" },
-  { value: "CORRETIVA_EMERGENCIAL", label: "Corretiva Emergencial", color: "#F87171" },
-  { value: "PREDITIVA", label: "Preditiva", color: "#A78BFA" },
+  { value: "PREVENTIVA", label: "Preventiva", color: "var(--cyan-badge)" },
+  { value: "CORRETIVA_PROGRAMADA", label: "Corretiva Programada", color: "var(--yellow-badge)" },
+  { value: "CORRETIVA_EMERGENCIAL", label: "Corretiva Emergencial", color: "var(--red-badge)" },
+  { value: "PREDITIVA", label: "Preditiva", color: "var(--orange)" },
 ];
 
 const PRIORIDADES: { value: PrioridadeOM; label: string; color: string }[] = [
-  { value: "BAIXA", label: "Baixa", color: "#4ADE80" },
-  { value: "MEDIA", label: "Média", color: "#FBBF24" },
-  { value: "ALTA", label: "Alta", color: "#F97316" },
-  { value: "CRITICA", label: "Crítica", color: "#F87171" },
+  { value: "BAIXA", label: "Baixa", color: "var(--green-badge)" },
+  { value: "MEDIA", label: "Média", color: "var(--yellow-badge)" },
+  { value: "ALTA", label: "Alta", color: "var(--orange)" },
+  { value: "CRITICA", label: "Crítica", color: "var(--red-badge)" },
 ];
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "10px 14px",
-  background: "rgba(15,23,42,0.6)",
-  border: "1px solid rgba(148,163,184,0.12)",
+  padding: "var(--input-padding-y) var(--input-padding-x)",
+  background: "var(--bg-primary)",
+  border: "1px solid var(--border-subtle)",
   borderRadius: "10px",
-  color: "#F1F5F9",
+  color: "var(--text-primary)",
   fontSize: "14px",
   outline: "none",
   transition: "border-color 0.2s",
@@ -56,7 +56,7 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: "12px",
   fontWeight: 600,
-  color: "#94A3B8",
+  color: "var(--text-secondary)",
   marginBottom: "6px",
   letterSpacing: "0.04em",
   textTransform: "uppercase",
@@ -206,39 +206,39 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(7,14,27,0.85)", backdropFilter: "blur(6px)" }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         className="w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col"
         style={{
-          background: "linear-gradient(135deg, #0F1C32 0%, #0A1428 100%)",
-          border: "1px solid rgba(148,163,184,0.1)",
+          background: "var(--bg-secondary)",
+          border: "1px solid var(--border-subtle)",
           borderRadius: "18px",
-          boxShadow: "0 32px 80px rgba(0,0,0,0.5)",
+          boxShadow: "0 32px 80px rgba(0,0,0,0.3)",
         }}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-7 py-5 shrink-0"
-          style={{ borderBottom: "1px solid rgba(148,163,184,0.08)" }}
+          className="flex items-center justify-between px-space-xl py-space-md shrink-0"
+          style={{ borderBottom: "1px solid var(--border-subtle)" }}
         >
           <div className="flex items-center gap-3">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "rgba(232,132,44,0.12)" }}
+              style={{ background: "var(--orange-glow)" }}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#E8842C" strokeWidth={1.5}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="var(--orange)" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085" />
               </svg>
             </div>
             <div>
-              <h2 className="text-[17px] font-bold" style={{ color: "#F1F5F9" }}>
+              <h2 className="text-[17px] font-bold" style={{ color: "var(--text-primary)" }}>
                 {isEdicao ? "Editar Ordem de Manutenção" : "Nova Ordem de Manutenção"}
               </h2>
-              <p className="text-[12px]" style={{ color: "#64748B" }}>
+              <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>
                 {isEdicao ? `Editando ${omParaEditar?.codigo}` : "Preencha os dados para emitir a OM"}
               </p>
             </div>
@@ -246,9 +246,9 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-            style={{ color: "#64748B" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(148,163,184,0.08)"; e.currentTarget.style.color = "#94A3B8"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748B"; }}
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--border-subtle)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -257,34 +257,36 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-7 py-6 space-y-6">
+        <form onSubmit={handleSubmit} className="px-space-xl py-space-lg space-y-6">
 
           {/* Equipamento */}
           <div>
-            <label style={labelStyle}>Equipamento <span style={{ color: "#F87171" }}>*</span></label>
+            <label style={labelStyle}>Equipamento <span style={{ color: "var(--red-badge)" }}>*</span></label>
             {equipSelecionado && !isEdicao ? (
               <div
-                className="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer"
-                style={{ background: "rgba(34,160,180,0.08)", border: "1px solid rgba(34,160,180,0.25)" }}
+                className="flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer border"
+                style={{ background: "var(--cyan-badge-bg)", borderColor: "var(--cyan-badge-border)" }}
               >
                 <div>
-                  <p className="text-[14px] font-semibold" style={{ color: "#22A0B4" }}>{equipSelecionado.nome}</p>
-                  <p className="text-[12px]" style={{ color: "#64748B" }}>{equipSelecionado.tag} · {equipSelecionado.localizacao}</p>
+                  <p className="text-[14px] font-semibold" style={{ color: "var(--cyan-badge)" }}>{equipSelecionado.nome}</p>
+                  <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>{equipSelecionado.tag} · {equipSelecionado.localizacao}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, equipamentoId: "" }))}
-                  className="text-[11px] font-medium cursor-pointer"
-                  style={{ color: "#64748B" }}
+                  className="text-[11px] font-semibold cursor-pointer transition-colors"
+                  style={{ color: "var(--text-secondary)" }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "var(--orange)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "var(--text-secondary)"; }}
                 >Trocar</button>
               </div>
             ) : isEdicao ? (
               <div
-                className="px-4 py-3 rounded-xl"
-                style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(148,163,184,0.12)" }}
+                className="px-4 py-3 rounded-xl border"
+                style={{ background: "var(--bg-primary)", borderColor: "var(--border-subtle)" }}
               >
-                <p className="text-[14px] font-semibold" style={{ color: "#94A3B8" }}>{omParaEditar?.equipamento.nome}</p>
-                <p className="text-[12px]" style={{ color: "#64748B" }}>{omParaEditar?.equipamento.tag}</p>
+                <p className="text-[14px] font-semibold" style={{ color: "var(--text-secondary)" }}>{omParaEditar?.equipamento.nome}</p>
+                <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>{omParaEditar?.equipamento.tag}</p>
               </div>
             ) : (
               <div>
@@ -295,22 +297,22 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
                   onChange={e => setBuscaEquip(e.target.value)}
                   style={{ ...inputStyle, marginBottom: "8px" }}
                 />
-                <div className="max-h-40 overflow-y-auto space-y-1.5" style={{ borderRadius: "10px" }}>
+                <div className="max-h-40 overflow-y-auto space-y-1.5 border p-1" style={{ borderRadius: "10px", borderColor: "var(--border-subtle)", background: "var(--bg-primary)" }}>
                   {equipFiltrados.length === 0 && (
-                    <p className="text-center text-[13px] py-3" style={{ color: "#475569" }}>Nenhum equipamento encontrado</p>
+                    <p className="text-center text-[13px] py-3" style={{ color: "var(--text-muted)" }}>Nenhum equipamento encontrado</p>
                   )}
                   {equipFiltrados.map(eq => (
                     <button
                       key={eq.id}
                       type="button"
                       onClick={() => setForm(prev => ({ ...prev, equipamentoId: eq.id }))}
-                      className="w-full text-left px-4 py-2.5 rounded-lg transition-all duration-150 cursor-pointer"
-                      style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(148,163,184,0.07)" }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(34,160,180,0.3)"; e.currentTarget.style.background = "rgba(34,160,180,0.06)"; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(148,163,184,0.07)"; e.currentTarget.style.background = "rgba(15,23,42,0.5)"; }}
+                      className="w-full text-left px-4 py-2.5 rounded-lg transition-all duration-150 cursor-pointer border border-transparent"
+                      style={{ background: "var(--bg-secondary)" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--border-accent)"; e.currentTarget.style.background = "var(--orange-glow)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.background = "var(--bg-secondary)"; }}
                     >
-                      <p className="text-[13px] font-semibold" style={{ color: "#F1F5F9" }}>{eq.nome}</p>
-                      <p className="text-[11px]" style={{ color: "#64748B" }}>{eq.tag} · {eq.localizacao}</p>
+                      <p className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>{eq.nome}</p>
+                      <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>{eq.tag} · {eq.localizacao}</p>
                     </button>
                   ))}
                 </div>
@@ -320,7 +322,7 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
 
           {/* Descrição */}
           <div>
-            <label style={labelStyle}>Descrição do Problema <span style={{ color: "#F87171" }}>*</span></label>
+            <label style={labelStyle}>Descrição do Problema <span style={{ color: "var(--red-badge)" }}>*</span></label>
             <textarea
               rows={3}
               placeholder="Descreva o problema detectado ou a intervenção necessária..."
@@ -332,21 +334,21 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
 
           {/* Tipo de Manutenção */}
           <div>
-            <label style={labelStyle}>Tipo de Manutenção <span style={{ color: "#F87171" }}>*</span></label>
+            <label style={labelStyle}>Tipo de Manutenção <span style={{ color: "var(--red-badge)" }}>*</span></label>
             <div className="grid grid-cols-2 gap-2">
               {TIPOS.map(t => (
                 <button
                   key={t.value}
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, tipo: t.value }))}
-                  className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-150 cursor-pointer"
+                  className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-150 cursor-pointer border"
                   style={{
-                    border: form.tipo === t.value ? `1px solid ${t.color}50` : "1px solid rgba(148,163,184,0.1)",
-                    background: form.tipo === t.value ? `${t.color}10` : "rgba(15,23,42,0.4)",
+                    borderColor: form.tipo === t.value ? t.color : "var(--border-subtle)",
+                    background: form.tipo === t.value ? "var(--orange-glow)" : "var(--bg-primary)",
                   }}
                 >
-                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: form.tipo === t.value ? t.color : "#334155" }} />
-                  <span className="text-[13px] font-medium" style={{ color: form.tipo === t.value ? t.color : "#64748B" }}>{t.label}</span>
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: t.color }} />
+                  <span className="text-[13px] font-semibold" style={{ color: form.tipo === t.value ? "var(--text-primary)" : "var(--text-secondary)" }}>{t.label}</span>
                 </button>
               ))}
             </div>
@@ -354,20 +356,20 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
 
           {/* Prioridade */}
           <div>
-            <label style={labelStyle}>Prioridade <span style={{ color: "#F87171" }}>*</span></label>
+            <label style={labelStyle}>Prioridade <span style={{ color: "var(--red-badge)" }}>*</span></label>
             <div className="grid grid-cols-4 gap-2">
               {PRIORIDADES.map(p => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, prioridade: p.value }))}
-                  className="px-3 py-2.5 rounded-xl text-center transition-all duration-150 cursor-pointer"
+                  className="px-3 py-2.5 rounded-xl text-center transition-all duration-150 cursor-pointer border"
                   style={{
-                    border: form.prioridade === p.value ? `1px solid ${p.color}50` : "1px solid rgba(148,163,184,0.1)",
-                    background: form.prioridade === p.value ? `${p.color}12` : "rgba(15,23,42,0.4)",
+                    borderColor: form.prioridade === p.value ? p.color : "var(--border-subtle)",
+                    background: form.prioridade === p.value ? "var(--orange-glow)" : "var(--bg-primary)",
                   }}
                 >
-                  <span className="text-[13px] font-semibold" style={{ color: form.prioridade === p.value ? p.color : "#475569" }}>{p.label}</span>
+                  <span className="text-[13px] font-bold" style={{ color: p.color }}>{p.label}</span>
                 </button>
               ))}
             </div>
@@ -380,15 +382,15 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
               type="datetime-local"
               value={form.dataInicioPrevisto}
               onChange={e => setForm(prev => ({ ...prev, dataInicioPrevisto: e.target.value }))}
-              style={{ ...inputStyle, colorScheme: "dark" }}
+              style={inputStyle}
             />
           </div>
 
           {/* Técnicos */}
           <div>
-            <label style={labelStyle}>Técnicos Responsáveis <span style={{ color: "#F87171" }}>*</span></label>
+            <label style={labelStyle}>Técnicos Responsáveis <span style={{ color: "var(--red-badge)" }}>*</span></label>
             {tecnicos.length === 0 ? (
-              <p className="text-[13px]" style={{ color: "#475569" }}>Nenhum técnico cadastrado no sistema.</p>
+              <p className="text-[13px]" style={{ color: "var(--text-muted)" }}>Nenhum técnico cadastrado no sistema.</p>
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 {tecnicos.map(t => {
@@ -398,24 +400,24 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
                       key={t.id}
                       type="button"
                       onClick={() => toggleTecnico(t.id)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-150 cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-150 cursor-pointer border"
                       style={{
-                        border: sel ? "1px solid rgba(232,132,44,0.4)" : "1px solid rgba(148,163,184,0.1)",
-                        background: sel ? "rgba(232,132,44,0.08)" : "rgba(15,23,42,0.4)",
+                        borderColor: sel ? "var(--orange)" : "var(--border-subtle)",
+                        background: sel ? "var(--orange-glow)" : "var(--bg-primary)",
                       }}
                     >
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0"
-                        style={{ background: sel ? "rgba(232,132,44,0.2)" : "rgba(100,116,139,0.15)", color: sel ? "#E8842C" : "#64748B" }}
+                        style={{ background: sel ? "rgba(232,132,44,0.15)" : "var(--border-subtle)", color: sel ? "var(--orange)" : "var(--text-secondary)" }}
                       >
                         {t.nome.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[13px] font-semibold truncate" style={{ color: sel ? "#F1F5F9" : "#94A3B8" }}>{t.nome}</p>
-                        <p className="text-[11px]" style={{ color: "#475569" }}>@{t.nomeUsuario}</p>
+                        <p className="text-[13px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>{t.nome}</p>
+                        <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>@{t.nomeUsuario}</p>
                       </div>
                       {sel && (
-                        <svg className="w-4 h-4 shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="#E8842C" strokeWidth={2}>
+                        <svg className="w-4 h-4 shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="var(--orange)" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                       )}
@@ -441,8 +443,8 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
               <button
                 type="button"
                 onClick={adicionarMaterial}
-                className="px-4 py-2 rounded-xl text-[13px] font-semibold transition-colors cursor-pointer"
-                style={{ background: "rgba(232,132,44,0.12)", color: "#E8842C", border: "1px solid rgba(232,132,44,0.2)" }}
+                className="px-4 py-2 rounded-xl text-[13px] font-semibold transition-colors cursor-pointer border"
+                style={{ background: "var(--orange-glow)", color: "var(--orange)", borderColor: "var(--orange)" }}
               >Adicionar</button>
             </div>
             {form.materiaisNecessarios.length > 0 && (
@@ -450,11 +452,11 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
                 {form.materiaisNecessarios.map(m => (
                   <span
                     key={m}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium"
-                    style={{ background: "rgba(34,160,180,0.08)", color: "#22A0B4", border: "1px solid rgba(34,160,180,0.2)" }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium border"
+                    style={{ background: "var(--cyan-badge-bg)", color: "var(--cyan-badge)", borderColor: "var(--cyan-badge-border)" }}
                   >
                     {m}
-                    <button type="button" onClick={() => removerMaterial(m)} className="cursor-pointer" style={{ color: "#64748B" }}>✕</button>
+                    <button type="button" onClick={() => removerMaterial(m)} className="cursor-pointer" style={{ color: "var(--text-muted)" }}>✕</button>
                   </span>
                 ))}
               </div>
@@ -475,25 +477,25 @@ export default function OrdemManutencaoFormModal({ isOpen, onClose, onSuccess, o
 
           {/* Erro */}
           {erro && (
-            <div className="px-4 py-3 rounded-xl" style={{ background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)" }}>
-              <p className="text-[13px]" style={{ color: "#F87171" }}>{erro}</p>
+            <div className="px-4 py-3 rounded-xl border" style={{ background: "var(--red-badge-bg)", borderColor: "var(--red-badge-border)" }}>
+              <p className="text-[13px]" style={{ color: "var(--red-badge)" }}>{erro}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 pt-2" style={{ borderTop: "1px solid rgba(148,163,184,0.07)" }}>
+          <div className="flex items-center justify-end gap-3 pt-2" style={{ borderTop: "1px solid var(--border-subtle)" }}>
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-[14px] font-medium transition-colors cursor-pointer"
-              style={{ color: "#64748B", background: "rgba(148,163,184,0.06)", border: "1px solid rgba(148,163,184,0.1)" }}
+              className="px-5 py-2.5 rounded-xl text-[14px] font-medium transition-colors cursor-pointer border"
+              style={{ color: "var(--text-secondary)", background: "rgba(148,163,184,0.06)", borderColor: "var(--border-subtle)" }}
             >Cancelar</button>
             <button
               type="submit"
               disabled={loading}
               className="px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all duration-200 cursor-pointer"
               style={{
-                background: loading ? "rgba(232,132,44,0.4)" : "linear-gradient(135deg, #E8842C, #D97706)",
+                background: loading ? "rgba(232,132,44,0.4)" : "var(--orange)",
                 color: "#fff",
                 opacity: loading ? 0.7 : 1,
               }}
