@@ -75,7 +75,13 @@ export default function OrdensManutencaoPage() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [filtroStatus, setFiltroStatus] = useState<StatusOM | "">("");
-  const [busca, setBusca] = useState("");
+  const [busca, setBusca] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("busca") || "";
+    }
+    return "";
+  });
   const [showModal, setShowModal] = useState(false);
   const [omParaEditar, setOmParaEditar] = useState<OrdemManutencao | null>(null);
   const [omParaDeletar, setOmParaDeletar] = useState<OrdemManutencao | null>(null);

@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Equipamento } from "./equipamento.entity";
 import { Componente } from "./componente.entity";
+import { User } from "./user.entity";
 
 export enum TipoModificacao {
   ADICAO = "ADICAO",
@@ -79,6 +80,13 @@ export class SolicitacaoModificacao {
 
   @Column({ type: "datetime", nullable: true })
   dataImplementacao: Date | null;
+
+  @Column({ type: "varchar", nullable: true })
+  solicitanteId: string | null;
+
+  @ManyToOne(() => User, { onDelete: "SET NULL", nullable: true, eager: true })
+  @JoinColumn({ name: "solicitanteId" })
+  solicitante: User | null;
 
   @CreateDateColumn()
   criadoEm: Date;

@@ -21,6 +21,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import type { Usuario } from "@/types/usuario.types";
 import { countPendentesApi } from "@/lib/api/reportes-substituicao";
+import { listAllModificacoesApi } from "@/lib/api/solicitacoes-modificacao";
 import { countNaoLidosApi } from "@/lib/api/alertas";
 import { useTheme } from "@/components/ThemeProvider";
 import { getSyncedDate, syncServerTime, isSynced } from "@/lib/time";
@@ -57,6 +58,12 @@ const navItems: NavItem[] = [
     href: "/ordens-manutencao",
     iconPath:
       "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
+  },
+  {
+    label: "Calendário",
+    href: "/calendario",
+    iconPath:
+      "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5",
   },
   {
     label: "Notificações",
@@ -139,8 +146,12 @@ export default function Sidebar() {
 
     async function fetchCount() {
       try {
-        const count = await countPendentesApi();
-        setPendingCount(count);
+        const [repCount, mods] = await Promise.all([
+          countPendentesApi(),
+          listAllModificacoesApi(),
+        ]);
+        const modCount = mods.filter((m) => m.status === "PENDENTE").length;
+        setPendingCount(repCount + modCount);
       } catch {
         /* Silencioso — badge simplesmente não aparece */
       }

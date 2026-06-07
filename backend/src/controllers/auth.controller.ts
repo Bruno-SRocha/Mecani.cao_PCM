@@ -17,6 +17,8 @@ import {
   updateUserService,
   deleteUserService,
   changePasswordService,
+  requestPasswordResetService,
+  resetPasswordService,
 } from "../services/auth.service";
 
 /**
@@ -192,6 +194,56 @@ export async function changePasswordController(req: Request, res: Response): Pro
   } catch (error) {
     res.status(400).json({
       error: error instanceof Error ? error.message : "Erro ao alterar senha.",
+    });
+  }
+}
+
+/**
+ * POST /api/auth/request-password-reset
+ *
+ * Solicita o e-mail de recuperação de senha.
+ */
+export async function requestPasswordResetController(req: Request, res: Response): Promise<void> {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ error: "Informe o e-mail corporativo." });
+      return;
+    }
+
+    await requestPasswordResetService(email);
+
+    res.status(200).json({
+      message: "Se o e-mail existir em nossa base, você receberá as instruções em breve.",
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Erro ao processar solicitação.",
+    });
+  }
+}
+
+/**
+ * POST /api/auth/reset-password
+ *
+ * Efetivamente redefine a senha utilizando o token de segurança.
+ */
+export async function resetPasswordController(req: Request, res: Response): Promise<void> {
+  try {
+    const { token, novaSenha } = req.body;
+
+    if (!token || !novaSenha) {
+      res.status(400).json({ error: "Informe o token de segurança e a nova senha." });
+      return;
+    }
+
+    await resetPasswordService(token, novaSenha);
+
+    res.status(200).json({ message: "Senha redefinida com sucesso." });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Erro ao redefinir a senha.",
     });
   }
 }

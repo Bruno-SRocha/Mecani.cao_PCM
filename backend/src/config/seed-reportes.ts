@@ -33,9 +33,13 @@ export async function seedReportes(): Promise<void> {
       senha: "tecnico@123",
       nome: "João Alves (Técnico)",
       nivel: NivelUsuario.TECNICO,
+      email: "tecnico@mecanicao.com.br",
     });
     tecnico1 = await UserRepository.save(tecnico1);
-    console.log("✅ Usuário técnico criado (tecnico / tecnico@123)");
+    console.log("✅ Usuário técnico criado (tecnico / tecnico@123 / tecnico@mecanicao.com.br)");
+  } else if (!tecnico1.email) {
+    tecnico1.email = "tecnico@mecanicao.com.br";
+    await UserRepository.save(tecnico1);
   }
 
   let tecnico2 = await UserRepository.findByNomeUsuario("tecnico2");
@@ -45,9 +49,13 @@ export async function seedReportes(): Promise<void> {
       senha: "tecnico@123",
       nome: "Carlos Mendes (Técnico)",
       nivel: NivelUsuario.TECNICO,
+      email: "tecnico2@mecanicao.com.br",
     });
     tecnico2 = await UserRepository.save(tecnico2);
-    console.log("✅ Usuário tecnico2 criado (tecnico2 / tecnico@123)");
+    console.log("✅ Usuário tecnico2 criado (tecnico2 / tecnico@123 / tecnico2@mecanicao.com.br)");
+  } else if (!tecnico2.email) {
+    tecnico2.email = "tecnico2@mecanicao.com.br";
+    await UserRepository.save(tecnico2);
   }
 
   let tecnico3 = await UserRepository.findByNomeUsuario("tecnico3");
@@ -57,9 +65,13 @@ export async function seedReportes(): Promise<void> {
       senha: "tecnico@123",
       nome: "Fernanda Costa (Técnica)",
       nivel: NivelUsuario.TECNICO,
+      email: "tecnico3@mecanicao.com.br",
     });
     tecnico3 = await UserRepository.save(tecnico3);
-    console.log("✅ Usuário tecnico3 criado (tecnico3 / tecnico@123)");
+    console.log("✅ Usuário tecnico3 criado (tecnico3 / tecnico@123 / tecnico3@mecanicao.com.br)");
+  } else if (!tecnico3.email) {
+    tecnico3.email = "tecnico3@mecanicao.com.br";
+    await UserRepository.save(tecnico3);
   }
 
   let gestor = await UserRepository.findByNomeUsuario("gestor");
@@ -69,9 +81,13 @@ export async function seedReportes(): Promise<void> {
       senha: "gestor@123",
       nome: "Supervisora Maria (Gestora)",
       nivel: NivelUsuario.GESTOR,
+      email: "gestor@mecanicao.com.br",
     });
     gestor = await UserRepository.save(gestor);
-    console.log("✅ Usuário gestor criado (gestor / gestor@123)");
+    console.log("✅ Usuário gestor criado (gestor / gestor@123 / gestor@mecanicao.com.br)");
+  } else if (!gestor.email) {
+    gestor.email = "gestor@mecanicao.com.br";
+    await UserRepository.save(gestor);
   }
 
   /* ── 2. Repositórios ──────────────────────────────────────── */

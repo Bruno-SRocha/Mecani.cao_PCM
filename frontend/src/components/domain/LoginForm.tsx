@@ -277,15 +277,15 @@ export default function LoginForm() {
           </span>
         </label>
 
-        {/* Link "Esqueceu sua senha?" */}
+        {/* Link "Esqueci minha senha" */}
         <a
-          href="#"
+          href="/recuperar-senha"
           className="text-[13px] transition-colors duration-200 hover:underline"
           style={{ color: "#94A3B8" }}
           onMouseEnter={(e) => { (e.target as HTMLAnchorElement).style.color = "#E8842C"; }}
           onMouseLeave={(e) => { (e.target as HTMLAnchorElement).style.color = "#94A3B8"; }}
         >
-          Esqueceu sua senha?
+          Esqueci minha senha
         </a>
       </div>
 

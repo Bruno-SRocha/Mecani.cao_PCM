@@ -142,3 +142,42 @@ export async function changePasswordApi(
     throw new Error(errorData?.error ?? "Erro ao alterar senha.");
   }
 }
+
+/**
+ * Solicita o e-mail de recuperação de senha.
+ */
+export async function requestPasswordResetApi(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE}/auth/request-password-reset`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao processar solicitação de recuperação.");
+  }
+
+  return response.json();
+}
+
+/**
+ * Efetivamente redefine a senha utilizando o token de segurança.
+ */
+export async function resetPasswordApi(
+  token: string,
+  novaSenha: string
+): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, novaSenha }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao redefinir a senha.");
+  }
+
+  return response.json();
+}

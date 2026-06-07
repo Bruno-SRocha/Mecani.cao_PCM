@@ -34,6 +34,19 @@ export interface SolicitacaoModificacao {
   parecerEngenharia: string | null;
   status: StatusModificacao;
   dataImplementacao: string | null;
+  solicitanteId: string | null;
+  solicitante?: {
+    id: string;
+    nome: string;
+    nomeUsuario: string;
+    nivel: string;
+  } | null;
+  equipamento?: {
+    id: string;
+    nome: string;
+    tag: string;
+    localizacao: string;
+  } | null;
   criadoEm: string;
   atualizadoEm: string;
 }

@@ -80,6 +80,15 @@ export class User {
   @Column({ length: 120, unique: true, nullable: true })
   email: string;
 
+  @Column({ type: "varchar", length: 255, nullable: true })
+  recuperacaoToken: string | null;
+
+  @Column({ type: "datetime", nullable: true })
+  recuperacaoExpiracao: Date | null;
+
+  @Column({ type: "int", default: 0 })
+  tokenVersion: number;
+
   /**
    * Indica se é o primeiro acesso do usuário (exige troca de senha).
    */

@@ -17,6 +17,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
+import { UserRepository } from "../repositories/user.repository";
 
 /**
  * Interface dos dados decodificados do token JWT.
@@ -26,6 +27,7 @@ interface JwtPayload {
   id: string;
   nomeUsuario: string;
   nivel: string;
+  tokenVersion: number;
 }
 
 /**
@@ -49,11 +51,11 @@ declare global {
  * Após a verificação bem-sucedida, os dados do usuário ficam
  * disponíveis em req.userId, req.userNomeUsuario e req.userNivel.
  */
-export function authMiddleware(
+export async function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   /* Extrai o header Authorization */
   const authHeader = req.headers.authorization;
 
@@ -76,6 +78,13 @@ export function authMiddleware(
   try {
     /* Verifica e decodifica o token JWT */
     const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+
+    /* Verifica a versão do token no banco para invalidar sessões antigas */
+    const user = await UserRepository.findOne({ where: { id: decoded.id } });
+    if (!user || user.tokenVersion !== decoded.tokenVersion) {
+      res.status(401).json({ error: "Token inválido ou expirado por redefinição de senha." });
+      return;
+    }
 
     /* Injeta os dados do usuário no objeto Request */
     req.userId = decoded.id;

@@ -12,6 +12,8 @@ import {
   updateUserController,
   deleteUserController,
   changePasswordController,
+  requestPasswordResetController,
+  resetPasswordController,
 } from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
@@ -27,6 +29,18 @@ const router = Router();
  * Autentica um usuário e retorna token JWT.
  */
 router.post("/login", loginController);
+
+/**
+ * POST /api/auth/request-password-reset
+ * Solicita o e-mail com token de redefinição de senha.
+ */
+router.post("/request-password-reset", requestPasswordResetController);
+
+/**
+ * POST /api/auth/reset-password
+ * Redefine a senha do usuário utilizando o token recebido por e-mail.
+ */
+router.post("/reset-password", resetPasswordController);
 
 /* ---------------------------------------------------------------
    Rotas protegidas para qualquer usuário autenticado

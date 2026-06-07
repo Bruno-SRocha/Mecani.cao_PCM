@@ -14,6 +14,7 @@ export interface CreateModificacaoData {
   novoComponenteNome?: string;
   novoComponenteTipo?: string;
   novoComponenteVidaUtilNominal?: number;
+  solicitanteId?: string;
 }
 
 export interface FinalizarModificacaoData {
@@ -78,6 +79,7 @@ export async function createModificacaoService(
     novoComponenteTipo: data.novoComponenteTipo?.trim() || null,
     novoComponenteVidaUtilNominal: data.novoComponenteVidaUtilNominal || null,
     status: StatusModificacao.PENDENTE,
+    solicitanteId: data.solicitanteId || null,
   });
 
   return SolicitacaoModificacaoRepository.save(solicitacao);

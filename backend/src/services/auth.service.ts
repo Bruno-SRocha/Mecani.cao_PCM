@@ -156,12 +156,13 @@ export async function loginService(
     throw new Error("Usuário ou senha inválidos.");
   }
 
-  /* 3. Gera o token JWT contendo o ID, username e nível de acesso */
+  /* 3. Gera o token JWT contendo o ID, username, nível de acesso e versão do token */
   const token = jwt.sign(
     {
       id: user.id,
       nomeUsuario: user.nomeUsuario,
       nivel: user.nivel,
+      tokenVersion: user.tokenVersion,
     },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN } as jwt.SignOptions
@@ -318,6 +319,7 @@ export async function changePasswordService(
   const saltRounds = 10;
   user.senha = await bcrypt.hash(novaSenha, saltRounds);
   user.primeiroAcesso = false;
+  user.tokenVersion = (user.tokenVersion || 0) + 1;
 
   await UserRepository.save(user);
 }
@@ -329,4 +331,142 @@ export async function listUsersService(): Promise<User[]> {
   return UserRepository.find({
     order: { criadoEm: "DESC" },
   });
+}
+
+/**
+ * Simula o envio de um e-mail de recuperação de senha gravando o arquivo em mock-emails/
+ * e exibindo o conteúdo no console do servidor.
+ */
+function simulateSendResetEmail(
+  nome: string,
+  email: string,
+  token: string,
+  expiracao: Date
+): void {
+  const dir = path.join(__dirname, "../../mock-emails");
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const content = `Para: ${email}
+Assunto: Mecâni.cão PCM - Recuperação de Senha
+Data: ${new Date().toLocaleString("pt-BR")}
+
+Olá ${nome},
+
+Recebemos uma solicitação para redefinir a senha da sua conta de colaborador no sistema Mecâni.cão PCM.
+
+Para definir uma nova senha, clique no link abaixo (ou copie e cole no seu navegador):
+http://localhost:3000/redefinir-senha?token=${token}
+
+Atenção: Este link é de uso único e expirará em 30 minutos (às ${expiracao.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}).
+
+Se você não solicitou esta redefinição, por favor desconsidere este e-mail.
+
+Atenciosamente,
+Equipe de TI Mecâni.cão PCM
+`;
+
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, "_");
+  const filename = `email-reset-${safeEmail}-${Date.now()}.txt`;
+  fs.writeFileSync(path.join(dir, filename), content, "utf-8");
+
+  console.log("\x1b[32m%s\x1b[0m", `[EMAIL SIMULATOR] E-mail de redefinição enviado para ${email}:`);
+  console.log(content);
+}
+
+/**
+ * Simula o envio de um e-mail de confirmação de senha alterada com sucesso.
+ */
+function simulateSendSuccessEmail(nome: string, email: string): void {
+  const dir = path.join(__dirname, "../../mock-emails");
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  const content = `Para: ${email}
+Assunto: Mecâni.cão PCM - Senha Alterada com Sucesso
+Data: ${new Date().toLocaleString("pt-BR")}
+
+Olá ${nome},
+
+Gostaríamos de confirmar que a senha da sua conta no Mecâni.cão PCM foi alterada com sucesso!
+
+Se você não realizou esta alteração, entre em contato imediatamente com o administrador do sistema.
+
+Atenciosamente,
+Equipe de TI Mecâni.cão PCM
+`;
+
+  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, "_");
+  const filename = `email-success-${safeEmail}-${Date.now()}.txt`;
+  fs.writeFileSync(path.join(dir, filename), content, "utf-8");
+
+  console.log("\x1b[32m%s\x1b[0m", `[EMAIL SIMULATOR] E-mail de confirmação enviado para ${email}:`);
+  console.log(content);
+}
+
+/**
+ * Solicita a recuperação de senha para um e-mail corporativo.
+ */
+export async function requestPasswordResetService(email: string): Promise<void> {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new Error("Formato de e-mail inválido.");
+  }
+
+  if (!email.endsWith("@mecanicao.com.br")) {
+    throw new Error("O e-mail deve pertencer ao domínio corporativo (@mecanicao.com.br).");
+  }
+
+  const user = await UserRepository.findOne({ where: { email } });
+
+  if (user) {
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const expiracao = new Date(Date.now() + 30 * 60 * 1000);
+
+    user.recuperacaoToken = token;
+    user.recuperacaoExpiracao = expiracao;
+    await UserRepository.save(user);
+
+    simulateSendResetEmail(user.nome, user.email, token, expiracao);
+  }
+}
+
+/**
+ * Redefine a senha do usuário utilizando o token de segurança.
+ */
+export async function resetPasswordService(token: string, novaSenha: string): Promise<void> {
+  if (!token) {
+    throw new Error("Token de redefinição inválido.");
+  }
+
+  const user = await UserRepository.findOne({ where: { recuperacaoToken: token } });
+  if (!user) {
+    throw new Error("Token inválido ou expirado.");
+  }
+
+  if (!user.recuperacaoExpiracao || new Date() > user.recuperacaoExpiracao) {
+    throw new Error("Token inválido ou expirado.");
+  }
+
+  if (novaSenha.length < 12) {
+    throw new Error("A nova senha deve ter no mínimo 12 caracteres.");
+  }
+  const regexNumero = /[0-9]/;
+  const regexSimbolo = /[!@#$%^&*()_+~`|}{[\]:;?><,./-]/;
+  if (!regexNumero.test(novaSenha) || !regexSimbolo.test(novaSenha)) {
+    throw new Error("A nova senha deve conter números e símbolos (caracteres especiais).");
+  }
+
+  const saltRounds = 10;
+  user.senha = await bcrypt.hash(novaSenha, saltRounds);
+  user.primeiroAcesso = false;
+  user.recuperacaoToken = null;
+  user.recuperacaoExpiracao = null;
+  user.tokenVersion = (user.tokenVersion || 0) + 1;
+
+  await UserRepository.save(user);
+
+  simulateSendSuccessEmail(user.nome, user.email);
 }

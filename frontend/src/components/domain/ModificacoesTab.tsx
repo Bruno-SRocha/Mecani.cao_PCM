@@ -216,7 +216,7 @@ export default function ModificacoesTab({
                       </span>
                     </div>
                     <p className="text-[11px]" style={{ color: "#475569" }}>
-                      Solicitada em: {formatToBrasilia(sol.criadoEm, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} BRT
+                      Solicitada por <span className="font-semibold text-slate-300">{sol.solicitante?.nome ?? "—"}</span> em: {formatToBrasilia(sol.criadoEm, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} BRT
                     </p>
                   </div>
 

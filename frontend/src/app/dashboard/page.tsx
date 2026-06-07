@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getSyncedDate } from "@/lib/time";
+import { getSyncedDate, getBrasiliaDateString, formatToBrasilia } from "@/lib/time";
 import type { Usuario } from "@/types/usuario.types";
 import { listEquipamentosApi } from "@/lib/api/equipamentos";
 import { listAlertasApi, marcarLidoApi, marcarTodosLidosApi } from "@/lib/api/alertas";
+import { listOrdensManutencaoApi } from "@/lib/api/ordens-manutencao";
 import type { Equipamento, StatusEquipamento } from "@/types/equipamento.types";
 import type { Alerta } from "@/lib/api/alertas";
+import type { OrdemManutencao } from "@/types/om.types";
 
 const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg: string }> = {
   OPERANDO: { label: "Operando", color: "var(--green-badge)", bg: "var(--green-badge-bg)" },
@@ -45,6 +47,7 @@ export default function DashboardPage() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [equipamentos, setEquipamentos] = useState<Equipamento[]>([]);
   const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [ordens, setOrdens] = useState<OrdemManutencao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -64,12 +67,14 @@ export default function DashboardPage() {
     setLoading(true);
     setError("");
     try {
-      const [eqData, alData] = await Promise.all([
+      const [eqData, alData, omData] = await Promise.all([
         listEquipamentosApi(),
         listAlertasApi(true), // apenas alertas não lidos
+        listOrdensManutencaoApi(),
       ]);
       setEquipamentos(eqData);
       setAlertas(alData);
+      setOrdens(omData);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Erro ao carregar dados do dashboard."
@@ -123,6 +128,16 @@ export default function DashboardPage() {
       })
     );
   }, [equipamentos]);
+
+  // Ordens de Manutenção do dia de hoje (Brasília Time)
+  const ordensDeHoje = useMemo(() => {
+    const todayStr = getBrasiliaDateString(now);
+    return ordens.filter((om) => {
+      if (!om.dataInicioPrevisto) return false;
+      const omDateStr = getBrasiliaDateString(new Date(om.dataInicioPrevisto));
+      return omDateStr === todayStr;
+    });
+  }, [ordens, now]);
 
   // Saúde Geral da Planta (Média ponderada dos componentes)
   const saudeGeral = useMemo(() => {
@@ -616,78 +631,175 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* ── Acesso rápido + Módulos Planejados ─────────────────────── */}
+      {/* ── Acesso rápido + Atividades de Hoje + Módulos Planejados ─────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         {/* Atalhos de navegação */}
-        <div className="lg:col-span-1 glass-card p-space-lg" style={{ borderRadius: "14px" }}>
-          <h2 className="text-[16px] font-bold mb-5 text-txt-primary">Acesso Rápido</h2>
-          <div className="space-y-3">
-            {[
-              {
-                label: "Ver Equipamentos",
-                sub: "Lista de todos os ativos da planta",
-                href: "/equipamentos",
-                color: "#22A0B4",
-                iconPath:
-                  "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085",
-              },
-              {
-                label: "Ordens de Manutenção",
-                sub: "Gerencie as OMs preventivas e corretivas",
-                href: "/ordens-manutencao",
-                color: "#E8842C",
-                iconPath:
-                  "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
-              },
-              {
-                label: "Notificações",
-                sub: "Histórico geral de alertas preventivos",
-                href: "/notificacoes",
-                color: "#F87171",
-                iconPath:
-                  "M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0",
-              },
-            ].map((link) => (
-              <button
-                key={link.href}
-                onClick={() => router.push(link.href)}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer"
-                style={{
-                  background: "rgba(148,163,184,0.05)",
-                  border: "1px solid rgba(148,163,184,0.08)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = `${link.color}0D`;
-                  e.currentTarget.style.borderColor = `${link.color}30`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(148,163,184,0.05)";
-                  e.currentTarget.style.borderColor = "rgba(148,163,184,0.08)";
-                }}
-              >
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: `${link.color}18` }}
+        <div className="lg:col-span-1 glass-card p-space-lg flex flex-col justify-between" style={{ borderRadius: "14px" }}>
+          <div>
+            <h2 className="text-[16px] font-bold mb-5 text-txt-primary">Acesso Rápido</h2>
+            <div className="space-y-3">
+              {[
+                {
+                  label: "Ver Equipamentos",
+                  sub: "Lista de todos os ativos da planta",
+                  href: "/equipamentos",
+                  color: "#22A0B4",
+                  iconPath:
+                    "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085",
+                },
+                {
+                  label: "Ordens de Manutenção",
+                  sub: "Gerencie as OMs preventivas e corretivas",
+                  href: "/ordens-manutencao",
+                  color: "#E8842C",
+                  iconPath:
+                    "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
+                },
+                {
+                  label: "Calendário PCM",
+                  sub: "Visualização do cronograma preventivo",
+                  href: "/calendario",
+                  color: "#1A7A8A",
+                  iconPath:
+                    "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5",
+                },
+              ].map((link) => (
+                <button
+                  key={link.href}
+                  onClick={() => router.push(link.href)}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer"
+                  style={{
+                    background: "rgba(148,163,184,0.05)",
+                    border: "1px solid rgba(148,163,184,0.08)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `${link.color}0D`;
+                    e.currentTarget.style.borderColor = `${link.color}30`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(148,163,184,0.05)";
+                    e.currentTarget.style.borderColor = "rgba(148,163,184,0.08)";
+                  }}
                 >
-                  <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke={link.color} strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={link.iconPath} />
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: `${link.color}18` }}
+                  >
+                    <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke={link.color} strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d={link.iconPath} />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-semibold text-txt-primary">{link.label}</p>
+                    <p className="text-[12px] text-txt-muted">{link.sub}</p>
+                  </div>
+                  <svg className="w-4 h-4 ml-auto shrink-0" fill="none" viewBox="0 0 24 24" stroke="#475569" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                   </svg>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[14px] font-semibold text-txt-primary">{link.label}</p>
-                  <p className="text-[12px] text-txt-muted">{link.sub}</p>
-                </div>
-                <svg className="w-4 h-4 ml-auto shrink-0" fill="none" viewBox="0 0 24 24" stroke="#475569" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
+        {/* Atividades de Hoje */}
+        <div className="lg:col-span-1 glass-card p-space-lg flex flex-col justify-between" style={{ borderRadius: "14px" }}>
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-[16px] font-bold text-txt-primary">Atividades de Hoje</h2>
+              <span
+                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                style={{
+                  background: ordensDeHoje.length > 0 ? "var(--bg-filter-chip-active)" : "var(--border-subtle)",
+                  color: ordensDeHoje.length > 0 ? "var(--orange)" : "var(--text-muted)",
+                }}
+              >
+                {ordensDeHoje.length} OM{ordensDeHoje.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-10">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--orange)" }} />
+              </div>
+            ) : ordensDeHoje.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <svg className="w-10 h-10 mb-2 text-txt-muted opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <p className="text-[13px] font-bold text-txt-secondary">Nenhuma atividade agendada</p>
+                <p className="text-[11px] text-txt-muted max-w-[220px] mx-auto">Tudo em dia para hoje no plano de manutenções preventivas.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[200px] overflow-y-auto pr-1">
+                {ordensDeHoje.slice(0, 3).map((om) => {
+                  const statusColors: Record<string, string> = {
+                    ABERTA: "var(--cyan-badge)",
+                    AGUARDANDO_INICIO: "var(--cyan-badge)",
+                    EM_EXECUCAO: "#FBBF24",
+                    PAUSADA: "var(--text-secondary)",
+                    CONCLUIDA: "var(--green-badge)",
+                    CANCELADA: "var(--text-muted)",
+                  };
+                  const color = statusColors[om.status] || "var(--text-secondary)";
+                  const time = om.dataInicioPrevisto
+                    ? formatToBrasilia(om.dataInicioPrevisto, { hour: "2-digit", minute: "2-digit" })
+                    : "—";
+
+                  return (
+                    <div
+                      key={om.id}
+                      onClick={() => router.push(`/ordens-manutencao?busca=${om.codigo}`)}
+                      className="p-3 rounded-xl border text-[12px] cursor-pointer hover:border-orange transition-all duration-150 flex flex-col gap-1"
+                      style={{
+                        background: "var(--bg-sub-card)",
+                        borderColor: "var(--border-sub-card)",
+                        borderLeft: `3px solid ${color}`,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono font-bold text-orange">{om.codigo}</span>
+                        <span className="text-[10px] font-bold text-txt-muted font-mono">{time}</span>
+                      </div>
+                      <div className="truncate font-bold text-txt-primary">{om.equipamento.nome}</div>
+                      <div className="text-[10px] font-bold text-txt-muted truncate">{om.equipamento.tag}</div>
+                    </div>
+                  );
+                })}
+                {ordensDeHoje.length > 3 && (
+                  <p className="text-[11px] text-txt-muted text-center pt-1 font-semibold">
+                    + {ordensDeHoje.length - 3} outra{ordensDeHoje.length - 3 > 1 ? "s" : ""} atividade{ordensDeHoje.length - 3 > 1 ? "s" : ""} hoje
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => router.push("/calendario")}
+            className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-200 cursor-pointer border"
+            style={{
+              background: "var(--bg-filter-chip-active)",
+              borderColor: "var(--orange)",
+              color: "var(--orange)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = "var(--shadow-glow)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = "";
+            }}
+          >
+            Ver Calendário
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>
+
         {/* Módulos Futuros/Planejados */}
-        <div className="lg:col-span-2 glass-card p-space-lg flex flex-col justify-between" style={{ borderRadius: "14px" }}>
+        <div className="lg:col-span-1 glass-card p-space-lg flex flex-col justify-between" style={{ borderRadius: "14px" }}>
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div
@@ -700,9 +812,8 @@ export default function DashboardPage() {
               </div>
               <h2 className="text-[16px] font-bold text-txt-primary">Próximos Módulos</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="flex flex-col gap-3">
               {[
-                { label: "Plano de Manutenção", desc: "Plano e calendário de manutenções preventivas" },
                 { label: "Relatórios & BI", desc: "Relatórios de confiabilidade (MTBF, MTTR) e custos" },
                 { label: "Histórico de Falhas", desc: "Registro detalhado de falhas mecânicas com FMEA" },
                 { label: "Estoque de Peças", desc: "Controle e previsão de estoque de peças críticas" },
@@ -722,7 +833,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-[12px] mt-5 pt-4 text-txt-muted border-t" style={{ borderColor: "var(--border-subtle)" }}>
-            Sistema em desenvolvimento ativo — novas funcionalidades são adicionadas a cada sprint de PCM.
+            Sistema em desenvolvimento ativo — novas funcionalidades são adicionadas a cada sprint.
           </p>
         </div>
       </div>

@@ -34,6 +34,7 @@ export async function createModificacaoController(
       novoComponenteNome,
       novoComponenteTipo,
       novoComponenteVidaUtilNominal: novoComponenteVidaUtilNominal ? Number(novoComponenteVidaUtilNominal) : undefined,
+      solicitanteId: req.userId,
     });
 
     res.status(201).json(solicitacao);
