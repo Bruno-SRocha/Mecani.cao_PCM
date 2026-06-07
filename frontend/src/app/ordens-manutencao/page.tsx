@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { OrdemManutencao, StatusOM, PrioridadeOM } from "@/types/om.types";
 import type { Usuario } from "@/types/usuario.types";
+import { formatToBrasilia, formatToBrasiliaDate } from "@/lib/time";
 import {
   TIPO_MANUTENCAO_LABELS,
   PRIORIDADE_LABELS,
@@ -308,12 +309,12 @@ export default function OrdensManutencaoPage() {
                         <span>
                           <span style={{ color: "var(--text-secondary)" }}>Início previsto:</span>{" "}
                           <span style={{ color: "var(--text-primary)" }}>
-                            {new Date(om.dataInicioPrevisto).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {formatToBrasilia(om.dataInicioPrevisto, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })} BRT
                           </span>
                         </span>
                       )}
                       <span style={{ color: "var(--text-secondary)" }}>
-                        {new Date(om.criadoEm).toLocaleDateString("pt-BR")}
+                        {formatToBrasiliaDate(om.criadoEm, { day: "2-digit", month: "2-digit", year: "numeric" })}
                       </span>
                     </div>
 

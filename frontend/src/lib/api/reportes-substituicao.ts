@@ -19,6 +19,12 @@ export type StatusReporte =
   | "APROVADO"
   | "REJEITADO";
 
+export type MotivoTroca =
+  | "PREVENTIVA"
+  | "CORRETIVA"
+  | "PREDITIVA"
+  | "DESGASTE_NATURAL";
+
 export interface ReporteSubstituicao {
   id: string;
   pecaInstalada: string;
@@ -26,6 +32,8 @@ export interface ReporteSubstituicao {
   dataSubstituicao: string;
   observacoes: string | null;
   status: StatusReporte;
+  motivo: MotivoTroca;
+  fabricanteNovaPeca: string | null;
   motivoRejeicao: string | null;
   componenteId: string;
   equipamentoId: string;
@@ -67,6 +75,28 @@ export interface CreateReporteRequest {
   vidaUtilNovaPeca: number;
   dataSubstituicao: string; // YYYY-MM-DD
   observacoes?: string;
+  motivo?: MotivoTroca;
+  fabricanteNovaPeca?: string;
+}
+
+export interface HistoricoFilters {
+  dataInicio?: string;
+  dataFim?: string;
+  tipoComponente?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface HistoricoResult {
+  registros: ReporteSubstituicao[];
+  total: number;
+  page: number;
+  totalPages: number;
+  mtbfPorComponente: Record<string, {
+    componenteNome: string;
+    mtbfDias: number;
+    totalTrocas: number;
+  }>;
 }
 
 /* ── Helpers ─────────────────────────────────────────────── */
@@ -241,6 +271,42 @@ export async function rejeitarReporteApi(
     const err = await response.json().catch(() => null);
     throw new Error(
       err?.error ?? `Erro ao rejeitar reporte (status ${response.status})`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Busca o histórico de substituições aprovadas de um equipamento.
+ * Suporta filtros por período, tipo de componente e paginação.
+ * Retorna MTBF por componente.
+ *
+ * GET /api/equipamentos/:equipamentoId/historico-substituicoes
+ */
+export async function getHistoricoEquipamentoApi(
+  equipamentoId: string,
+  filters?: HistoricoFilters
+): Promise<HistoricoResult> {
+  const params = new URLSearchParams();
+  if (filters?.dataInicio) params.set("dataInicio", filters.dataInicio);
+  if (filters?.dataFim) params.set("dataFim", filters.dataFim);
+  if (filters?.tipoComponente) params.set("tipoComponente", filters.tipoComponente);
+  if (filters?.page) params.set("page", String(filters.page));
+  if (filters?.limit) params.set("limit", String(filters.limit));
+
+  const qs = params.toString();
+  const url = `${API_BASE}/equipamentos/${equipamentoId}/historico-substituicoes${qs ? `?${qs}` : ""}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => null);
+    throw new Error(
+      err?.error ?? `Erro ao buscar histórico (status ${response.status})`
     );
   }
 

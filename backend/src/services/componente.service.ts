@@ -59,7 +59,7 @@ function calcularDesgaste(
   vidaUtilNominal: number
 ): number {
   if (vidaUtilNominal <= 0) return 0;
-  return Math.min((horasOperacionais / vidaUtilNominal) * 100, 100);
+  return (horasOperacionais / vidaUtilNominal) * 100;
 }
 
 /**
@@ -170,6 +170,14 @@ export async function createComponenteService(
     throw new Error("Horas operacionais não podem ser negativas.");
   }
 
+  const wear = (horasOperacionais / data.vidaUtilNominal) * 100;
+  let status = "Saudável";
+  if (wear >= 100) {
+    status = "Crítico";
+  } else if (wear >= 85) {
+    status = "Atenção";
+  }
+
   const componente = ComponenteRepository.create({
     nome: data.nome,
     tipo: data.tipo,
@@ -177,6 +185,7 @@ export async function createComponenteService(
     horasOperacionais,
     equipamentoId,
     equipamento,
+    status,
   });
 
   const saved = await ComponenteRepository.save(componente);
@@ -228,6 +237,15 @@ export async function updateComponenteService(
     componente.vidaUtilNominal = data.vidaUtilNominal;
   if (data.horasOperacionais !== undefined)
     componente.horasOperacionais = data.horasOperacionais;
+
+  const currentWear = (componente.horasOperacionais / componente.vidaUtilNominal) * 100;
+  let newStatus = "Saudável";
+  if (currentWear >= 100) {
+    newStatus = "Crítico";
+  } else if (currentWear >= 85) {
+    newStatus = "Atenção";
+  }
+  componente.status = newStatus;
 
   const saved = await ComponenteRepository.save(componente);
   return enriquecerComponente(saved);

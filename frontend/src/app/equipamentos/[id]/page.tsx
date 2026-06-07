@@ -8,9 +8,11 @@ import { deleteComponenteApi } from "@/lib/api/componentes";
 import type { ComponenteComDesgaste } from "@/lib/api/componentes";
 import ComponenteFormModal from "@/components/domain/ComponenteFormModal";
 import ReporteSubstituicaoModal from "@/components/domain/ReporteSubstituicaoModal";
+import HistoricoTab from "@/components/domain/HistoricoTab";
 import type { NivelUsuario } from "@/types/usuario.types";
 import DiagnosticoTab from "@/components/domain/DiagnosticoTab";
 import ModificacoesTab from "@/components/domain/ModificacoesTab";
+import { formatToBrasiliaDate } from "@/lib/time";
 
 const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg: string }> = {
   OPERANDO: { label: "Operando", color: "var(--green-badge)", bg: "var(--green-badge-bg)" },
@@ -18,13 +20,13 @@ const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg
   MANUTENCAO: { label: "Manutenção", color: "var(--yellow-badge)", bg: "var(--yellow-badge-bg)" },
 };
 
-function calcDesgaste(h: number, v: number) { return v > 0 ? Math.min((h / v) * 100, 100) : 0; }
-function desgasteColor(p: number) { return p >= 85 ? "var(--red-badge)" : p >= 60 ? "var(--yellow-badge)" : "var(--green-badge)"; }
-function desgasteLabel(p: number) { return p >= 85 ? "Crítico" : p >= 60 ? "Atenção" : "Saudável"; }
+function calcDesgaste(h: number, v: number) { return v > 0 ? (h / v) * 100 : 0; }
+function desgasteColor(p: number) { return p >= 100 ? "var(--red-badge)" : p >= 85 ? "var(--yellow-badge)" : "var(--green-badge)"; }
+function desgasteLabel(p: number) { return p >= 100 ? "Crítico" : p >= 85 ? "Atenção" : "Saudável"; }
 
 function formatDate(d: string | null) {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  return formatToBrasiliaDate(d, { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function tipoIcon(tipo: string): string {
@@ -44,7 +46,7 @@ export default function EquipamentoDetalhesPage() {
   const [equipamento, setEquipamento] = useState<Equipamento | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
-  const [activeTab, setActiveTab] = useState<"VISAO_GERAL" | "DIAGNOSTICOS" | "MODIFICACOES">("VISAO_GERAL");
+  const [activeTab, setActiveTab] = useState<"VISAO_GERAL" | "DIAGNOSTICOS" | "MODIFICACOES" | "HISTORICO">("VISAO_GERAL");
   
   const [userId, setUserId] = useState("");
   const [userNivel, setUserNivel] = useState<NivelUsuario>("TECNICO");
@@ -183,6 +185,13 @@ export default function EquipamentoDetalhesPage() {
           Modificações & BOM
           {activeTab === "MODIFICACOES" && <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: "var(--teal)" }} />}
         </button>
+        <button
+          onClick={() => setActiveTab("HISTORICO")}
+          className={`pb-4 text-[14px] font-semibold transition-all cursor-pointer relative ${activeTab === "HISTORICO" ? "text-txt-primary" : "text-txt-muted hover:text-txt-secondary"}`}
+        >
+          Histórico
+          {activeTab === "HISTORICO" && <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ background: "var(--teal)" }} />}
+        </button>
       </div>
 
       {activeTab === "VISAO_GERAL" ? (
@@ -259,9 +268,9 @@ export default function EquipamentoDetalhesPage() {
                   // Setup correct icon background based on variables
                   const bgVal = comp.modificado
                     ? "var(--cyan-badge-bg)"
-                    : desgaste >= 85
+                    : desgaste >= 100
                     ? "var(--red-badge-bg)"
-                    : desgaste >= 60
+                    : desgaste >= 85
                     ? "var(--yellow-badge-bg)"
                     : "var(--green-badge-bg)";
 
@@ -314,7 +323,7 @@ export default function EquipamentoDetalhesPage() {
                             <span className="text-[11px] font-bold" style={{ color: cor }}>{desgaste.toFixed(1)}%</span>
                           </div>
                           <div className="w-full h-2 rounded-full" style={{ background: "rgba(148, 163, 184, 0.1)" }}>
-                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${desgaste}%`, background: cor }} />
+                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(desgaste, 100)}%`, background: cor }} />
                           </div>
                         </div>
 
@@ -379,13 +388,18 @@ export default function EquipamentoDetalhesPage() {
           userNivel={userNivel}
           userId={userId}
         />
-      ) : (
+      ) : activeTab === "MODIFICACOES" ? (
         <ModificacoesTab
           equipamentoId={equipamento.id}
           userNivel={userNivel}
           userId={userId}
           componentes={equipamento.componentes as ComponenteComDesgaste[]}
           onBOMUpdated={fetchEquipamento}
+        />
+      ) : (
+        <HistoricoTab
+          equipamentoId={equipamento.id}
+          tiposComponente={[...new Set(equipamento.componentes.map(c => c.tipo))]}
         />
       )}
 

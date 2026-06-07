@@ -27,6 +27,7 @@ import {
   countPendentesService,
   aprovarReporteService,
   rejeitarReporteService,
+  getHistoricoEquipamentoService,
 } from "../services/reporte-substituicao.service";
 
 /**
@@ -42,7 +43,7 @@ export async function createReporteController(
     const componenteId = req.params.componenteId as string;
     const tecnicoId = req.userId as string;
 
-    const { pecaInstalada, vidaUtilNovaPeca, dataSubstituicao, observacoes } =
+    const { pecaInstalada, vidaUtilNovaPeca, dataSubstituicao, observacoes, motivo, fabricanteNovaPeca } =
       req.body;
 
     if (!pecaInstalada) {
@@ -73,6 +74,8 @@ export async function createReporteController(
         vidaUtilNovaPeca: Number(vidaUtilNovaPeca),
         dataSubstituicao,
         observacoes,
+        motivo,
+        fabricanteNovaPeca,
       }
     );
 
@@ -220,6 +223,35 @@ export async function rejeitarReporteController(
       : message.includes("já foi")
       ? 409
       : 500;
+    res.status(statusCode).json({ error: message });
+  }
+}
+
+/**
+ * GET /api/equipamentos/:equipamentoId/historico-substituicoes
+ * Retorna o histórico de substituições aprovadas do equipamento com MTBF.
+ */
+export async function getHistoricoEquipamentoController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const equipamentoId = req.params.equipamentoId as string;
+    const { dataInicio, dataFim, tipoComponente, page, limit } = req.query;
+
+    const result = await getHistoricoEquipamentoService(equipamentoId, {
+      dataInicio: dataInicio as string | undefined,
+      dataFim: dataFim as string | undefined,
+      tipoComponente: tipoComponente as string | undefined,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Erro ao buscar histórico.";
+    const statusCode = message.includes("não encontrado") ? 404 : 500;
     res.status(statusCode).json({ error: message });
   }
 }

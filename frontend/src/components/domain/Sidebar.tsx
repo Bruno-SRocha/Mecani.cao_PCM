@@ -21,7 +21,9 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import type { Usuario } from "@/types/usuario.types";
 import { countPendentesApi } from "@/lib/api/reportes-substituicao";
+import { countNaoLidosApi } from "@/lib/api/alertas";
 import { useTheme } from "@/components/ThemeProvider";
+import { getSyncedDate, syncServerTime, isSynced } from "@/lib/time";
 
 /**
  * Item de navegação da sidebar.
@@ -57,6 +59,12 @@ const navItems: NavItem[] = [
       "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4",
   },
   {
+    label: "Notificações",
+    href: "/notificacoes",
+    iconPath:
+      "M14.857 17.082a9.049 9.049 0 0 1-5.185-2.883 9.049 9.049 0 0 1-2.883-5.185m0 0A8.96 8.96 0 0 1 8 8V7C8 4.24 10.24 2 13 2s5 2.24 5 5v1c0 .38.07.74.205 1.082m-11.348 0a8.96 8.96 0 0 0-1.9 5.46M12 21a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0 3 0m-3 0H9m1.05-3.116A11.95 11.95 0 0 1 12 18c1.328 0 2.583-.217 3.75-.616m-5.7 3.125A1.5 1.5 0 0 1 9 21",
+  },
+  {
     label: "Aprovações",
     href: "/aprovacoes",
     iconPath:
@@ -70,8 +78,37 @@ export default function Sidebar() {
   const router = useRouter();
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { theme, toggleTheme } = useTheme();
+  const [timeString, setTimeString] = useState<string>("—");
+
+  /* Relógio sincronizado no fuso de Brasília */
+  useEffect(() => {
+    if (!isSynced()) {
+      syncServerTime();
+    }
+
+    const updateClock = () => {
+      const now = getSyncedDate();
+      const time = now.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "America/Sao_Paulo",
+      });
+      const date = now.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+        timeZone: "America/Sao_Paulo",
+      });
+      setTimeString(`${time} ${date}`);
+    };
+
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   /* Carrega os dados do usuário logado do localStorage */
   useEffect(() => {
@@ -112,6 +149,38 @@ export default function Sidebar() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [usuario?.nivel]);
+
+  /**
+   * Busca e atualiza o contador de alertas não lidos.
+   * Polled a cada 15s para manter o badge de notificações atualizado.
+   */
+  useEffect(() => {
+    if (!usuario) {
+      setUnreadCount(0);
+      return;
+    }
+
+    async function fetchUnreadCount() {
+      try {
+        const count = await countNaoLidosApi();
+        setUnreadCount(count);
+      } catch {
+        /* Silencioso */
+      }
+    }
+
+    fetchUnreadCount();
+    
+    // Escuta evento customizado para atualização instantânea
+    window.addEventListener("alertStatusChanged", fetchUnreadCount);
+    
+    const alertInterval = setInterval(fetchUnreadCount, 15_000);
+
+    return () => {
+      window.removeEventListener("alertStatusChanged", fetchUnreadCount);
+      clearInterval(alertInterval);
+    };
+  }, [usuario]);
 
   /**
    * Handler de logout — limpa os dados de sessão e redireciona para o login.
@@ -221,10 +290,16 @@ export default function Sidebar() {
           if (item.adminOnly && !isManagerOrAdmin) return null;
 
           const isActive = pathname.startsWith(item.href);
-          const showBadge =
+          const isAprovacoesBadge =
             item.href === "/aprovacoes" &&
             isManagerOrAdmin &&
             pendingCount > 0;
+          const isAlertasBadge =
+            item.href === "/notificacoes" &&
+            unreadCount > 0;
+
+          const showBadge = isAprovacoesBadge || isAlertasBadge;
+          const badgeVal = isAprovacoesBadge ? pendingCount : unreadCount;
 
           return (
             <a
@@ -277,7 +352,7 @@ export default function Sidebar() {
 
               <span className="flex-1 leading-tight">{item.label}</span>
 
-              {/* Badge de notificação de pendências */}
+              {/* Badge de notificação */}
               {showBadge && (
                 <span
                   className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-bold shrink-0"
@@ -289,7 +364,7 @@ export default function Sidebar() {
                     animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                   }}
                 >
-                  {badgeLabel(pendingCount)}
+                  {badgeLabel(badgeVal)}
                 </span>
               )}
             </a>
@@ -304,6 +379,29 @@ export default function Sidebar() {
         className="px-3 py-4 border-t"
         style={{ borderColor: "var(--border-subtle)" }}
       >
+        {/* Relógio/Data de Brasília (UTC-3) */}
+        <div className="flex flex-col gap-0.5 mb-3 px-4 py-2.5 rounded-xl border border-dashed"
+          style={{
+            background: "rgba(232, 132, 44, 0.03)",
+            borderColor: "rgba(232, 132, 44, 0.15)",
+          }}
+        >
+          <span className="text-[10px] font-semibold tracking-wider uppercase" style={{ color: "#E8842C" }}>
+            Fuso Horário Padrão
+          </span>
+          <div className="flex items-center gap-2 mt-1">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="#E8842C" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <span className="text-[14px] font-bold font-mono tracking-wide" style={{ color: "var(--text-primary)" }}>
+              {timeString}
+            </span>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(232, 132, 44, 0.12)", color: "#E8842C" }}>
+              BRT
+            </span>
+          </div>
+        </div>
+
         {/* Info do usuário logado */}
         {usuario && (
           <div className="flex items-center gap-3 mb-3 px-3 py-3 rounded-xl"

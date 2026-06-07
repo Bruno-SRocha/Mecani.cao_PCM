@@ -27,6 +27,7 @@ import {
   updateEquipamentoController,
   deleteEquipamentoController,
 } from "../controllers/equipamento.controller";
+import { getHistoricoEquipamentoController } from "../controllers/reporte-substituicao.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { authorize } from "../middlewares/authorize.middleware";
 
@@ -47,6 +48,13 @@ router.use(authMiddleware);
  * Lista todos os equipamentos cadastrados com seus componentes.
  */
 router.get("/", listEquipamentosController);
+
+/**
+ * GET /api/equipamentos/:equipamentoId/historico-substituicoes
+ * Retorna o histórico de substituições aprovadas com MTBF.
+ * Suporta query params: dataInicio, dataFim, tipoComponente, page, limit.
+ */
+router.get("/:equipamentoId/historico-substituicoes", getHistoricoEquipamentoController);
 
 /**
  * GET /api/equipamentos/:id

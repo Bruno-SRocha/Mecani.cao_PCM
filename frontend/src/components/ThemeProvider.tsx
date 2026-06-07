@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { syncServerTime } from "@/lib/time";
 
 type Theme = "light" | "dark";
 
@@ -16,6 +17,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
 
   useEffect(() => {
+    // Sincroniza o relógio com o servidor
+    syncServerTime();
+
     // Read theme from localStorage or OS settings
     const storedTheme = localStorage.getItem("theme") as Theme | null;
     if (storedTheme === "light" || storedTheme === "dark") {

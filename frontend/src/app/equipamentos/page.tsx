@@ -17,13 +17,13 @@ const statusConfig: Record<StatusEquipamento, { label: string; color: string; bg
 /** Calcula o desgaste percentual de um componente */
 function calcDesgaste(horas: number, vidaUtil: number): number {
   if (vidaUtil <= 0) return 0;
-  return Math.min((horas / vidaUtil) * 100, 100);
+  return (horas / vidaUtil) * 100;
 }
 
 /** Retorna a cor do indicador de desgaste (verde → amarelo → vermelho) */
 function desgasteColor(pct: number): string {
-  if (pct >= 85) return "var(--red-badge)";
-  if (pct >= 60) return "var(--yellow-badge)";
+  if (pct >= 100) return "var(--red-badge)";
+  if (pct >= 85) return "var(--yellow-badge)";
   return "var(--green-badge)";
 }
 
@@ -93,7 +93,7 @@ export default function EquipamentosPage() {
   }), [equipamentos]);
 
   return (
-    <div className="page-container animate-fade-in-up" style={{ animationFillMode: "both", maxWidth: "1400px" }}>
+    <div className="page-container animate-fade-in-up" style={{ animationFillMode: "both" }}>
       {/* Header */}
       <div className="flex items-start justify-between mb-10">
         <div>
@@ -152,7 +152,7 @@ export default function EquipamentosPage() {
 
       {/* Search + Filter bar */}
       <div className="flex flex-wrap items-center gap-4 mb-8">
-        <div className="search-input-wrapper flex-1" style={{ minWidth: "260px", maxWidth: "480px" }}>
+        <div className="search-input-wrapper flex-1" style={{ minWidth: "260px" }}>
           <svg className="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
@@ -270,7 +270,7 @@ export default function EquipamentosPage() {
                   </div>
                   <div className="w-full h-1.5 rounded-full" style={{ background: "rgba(148, 163, 184, 0.1)" }}>
                     <div className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${maxDesgaste}%`, background: desgasteColor(maxDesgaste) }} />
+                      style={{ width: `${Math.min(maxDesgaste, 100)}%`, background: desgasteColor(maxDesgaste) }} />
                   </div>
                 </div>
 

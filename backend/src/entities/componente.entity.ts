@@ -90,6 +90,13 @@ export class Componente {
   modificado: boolean;
 
   /**
+   * Status de desgaste do componente (Saudável, Atenção, Crítico).
+   * Atualizado automaticamente pelo sistema de background.
+   */
+  @Column({ type: "varchar", length: 50, default: "Saudável" })
+  status: string;
+
+  /**
    * Data de criação do registro (preenchida automaticamente).
    */
   @CreateDateColumn()

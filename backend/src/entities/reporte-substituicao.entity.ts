@@ -40,6 +40,16 @@ export enum StatusReporte {
   REJEITADO = "REJEITADO",
 }
 
+/**
+ * Motivo/classificação da troca do componente.
+ */
+export enum MotivoTroca {
+  PREVENTIVA = "PREVENTIVA",
+  CORRETIVA = "CORRETIVA",
+  PREDITIVA = "PREDITIVA",
+  DESGASTE_NATURAL = "DESGASTE_NATURAL",
+}
+
 @Entity("reportes_substituicao")
 export class ReporteSubstituicao {
   /**
@@ -67,6 +77,24 @@ export class ReporteSubstituicao {
    */
   @Column({ type: "date" })
   dataSubstituicao: Date;
+
+  /**
+   * Motivo/classificação da troca do componente.
+   * Ex: Preventiva, Corretiva, Preditiva, Desgaste Natural.
+   */
+  @Column({
+    type: "enum",
+    enum: MotivoTroca,
+    default: MotivoTroca.CORRETIVA,
+  })
+  motivo: MotivoTroca;
+
+  /**
+   * Fabricante da nova peça instalada.
+   * Ex: "SKF", "John Crane", "Gates"
+   */
+  @Column({ length: 120, nullable: true })
+  fabricanteNovaPeca: string;
 
   /**
    * Observações livres do técnico sobre a substituição.

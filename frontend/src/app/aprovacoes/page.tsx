@@ -36,24 +36,16 @@ const statusConfig: Record<
 
 type FilterStatus = "TODOS" | StatusReporte;
 
+import { formatToBrasilia, formatToBrasiliaDate } from "@/lib/time";
+
 function formatDate(d: string | null) {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return formatToBrasiliaDate(d);
 }
 
 function formatDatetime(d: string | null) {
   if (!d) return "—";
-  return new Date(d).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return `${formatToBrasilia(d)} BRT`;
 }
 
 export default function AprovacoesPage() {

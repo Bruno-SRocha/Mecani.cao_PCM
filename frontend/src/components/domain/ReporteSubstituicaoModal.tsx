@@ -4,8 +4,11 @@ import { useState, type FormEvent } from "react";
 import {
   createReporteApi,
   type CreateReporteRequest,
+  type MotivoTroca,
 } from "@/lib/api/reportes-substituicao";
 import type { ComponenteComDesgaste } from "@/lib/api/componentes";
+
+import { getBrasiliaDateString } from "@/lib/time";
 
 interface Props {
   equipamentoId: string;
@@ -24,9 +27,11 @@ export default function ReporteSubstituicaoModal({
   const [pecaInstalada, setPecaInstalada] = useState("");
   const [vidaUtil, setVidaUtil] = useState("");
   const [dataSubstituicao, setDataSubstituicao] = useState(
-    new Date().toISOString().split("T")[0]
+    getBrasiliaDateString()
   );
   const [observacoes, setObservacoes] = useState("");
+  const [motivo, setMotivo] = useState<MotivoTroca>("CORRETIVA");
+  const [fabricanteNovaPeca, setFabricanteNovaPeca] = useState("");
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
@@ -58,6 +63,8 @@ export default function ReporteSubstituicaoModal({
         vidaUtilNovaPeca: vidaUtilNum,
         dataSubstituicao,
         observacoes: observacoes.trim() || undefined,
+        motivo,
+        fabricanteNovaPeca: fabricanteNovaPeca.trim() || undefined,
       };
       await createReporteApi(equipamentoId, componente.id, payload);
       setSucesso(true);
@@ -302,6 +309,45 @@ export default function ReporteSubstituicaoModal({
                     ...inputStyle,
                     colorScheme: "dark",
                   }}
+                  disabled={saving}
+                  onFocus={(e) => { e.target.style.borderColor = accentBorder; }}
+                  onBlur={(e) => { e.target.style.borderColor = "rgba(100, 116, 139, 0.2)"; }}
+                />
+              </div>
+            </div>
+
+            {/* ── Motivo + Fabricante ── */}
+            <div className="grid grid-cols-2 gap-5">
+              <div>
+                <label className={labelCls} style={labelStyle}>
+                  Motivo da Troca *
+                </label>
+                <select
+                  id="reporte-motivo"
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value as MotivoTroca)}
+                  className={`${inputCls} cursor-pointer`}
+                  style={{ ...inputStyle, colorScheme: "dark" }}
+                  disabled={saving}
+                >
+                  <option value="CORRETIVA">Corretiva (Quebra)</option>
+                  <option value="PREVENTIVA">Preventiva</option>
+                  <option value="PREDITIVA">Preditiva</option>
+                  <option value="DESGASTE_NATURAL">Desgaste Natural</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelCls} style={labelStyle}>
+                  Fabricante da Nova Peça
+                </label>
+                <input
+                  id="reporte-fabricante"
+                  type="text"
+                  value={fabricanteNovaPeca}
+                  onChange={(e) => setFabricanteNovaPeca(e.target.value)}
+                  placeholder="Ex: SKF, John Crane, Gates"
+                  className={inputCls}
+                  style={inputStyle}
                   disabled={saving}
                   onFocus={(e) => { e.target.style.borderColor = accentBorder; }}
                   onBlur={(e) => { e.target.style.borderColor = "rgba(100, 116, 139, 0.2)"; }}

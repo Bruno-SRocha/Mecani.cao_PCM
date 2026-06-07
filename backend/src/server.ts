@@ -33,6 +33,8 @@ import {
 import { seedAdminUser } from "./config/seed";
 import { seedEquipamentos } from "./config/seed-equipamentos";
 import { seedReportes } from "./config/seed-reportes";
+import { startBackgroundWearCalculator } from "./services/background-wear.service";
+import alertaRoutes from "./routes/alerta.routes";
 
 const app = express();
 
@@ -86,6 +88,7 @@ app.use("/api/equipamentos/:equipamentoId/componentes/:componenteId/reportes", r
 app.use("/api/reportes", reporteGlobalRouter);
 app.use("/api/equipamentos/:equipamentoId/solicitacoes-modificacao", solicitacaoModificacaoEquipamentoRouter);
 app.use("/api/solicitacoes-modificacao", solicitacaoModificacaoGlobalRouter);
+app.use("/api/alertas", alertaRoutes);
 
 /* ---------------------------------------------------------------
    Inicialização: Conexão com banco + Start do servidor
@@ -111,6 +114,9 @@ AppDataSource.initialize()
 
     /* Cria usuários de teste e reportes de demonstração se não existirem */
     await seedReportes();
+
+    /* Inicia o serviço de cálculo de desgaste em background */
+    startBackgroundWearCalculator();
 
     /* Inicia o servidor HTTP */
     app.listen(env.PORT, () => {

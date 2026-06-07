@@ -10,6 +10,7 @@ import {
   obterAuditoriaDiagnostico 
 } from "@/lib/api/diagnosticos";
 import type { NivelUsuario } from "@/types/usuario.types";
+import { formatToBrasilia, formatToBrasiliaDate, getBrasiliaDateString } from "@/lib/time";
 
 interface DiagnosticoTabProps {
   equipamentoId: string;
@@ -65,7 +66,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
       setTexto(item.texto);
     } else {
       setEditItem(null);
-      setData(new Date().toISOString().split("T")[0]);
+      setData(getBrasiliaDateString());
       setSeveridade("BAIXA");
       setTexto("");
     }
@@ -136,7 +137,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <span className="text-[14px] font-bold" style={{ color: "#F1F5F9" }}>
-                          {new Date(diag.data).toLocaleDateString("pt-BR")}
+                          {formatToBrasiliaDate(diag.data, { day: "2-digit", month: "2-digit", year: "numeric" })}
                         </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style={{ background: config.bg, color: config.cor }}>
                           {config.label}
@@ -218,7 +219,7 @@ export default function DiagnosticoTab({ equipamentoId, userNivel, userId }: Dia
                 auditoria.map((hist) => (
                   <div key={hist.id} className="p-4 bg-[#0B1121] rounded-lg border border-[#1E293B]">
                     <div className="flex justify-between mb-2">
-                      <span className="text-xs text-gray-400">{new Date(hist.dataEdicao).toLocaleString("pt-BR")}</span>
+                      <span className="text-xs text-gray-400">{formatToBrasilia(hist.dataEdicao)} BRT</span>
                       <span className="text-xs text-[#22A0B4]">Editado por: {hist.editor.nome}</span>
                     </div>
                     <p className="text-xs mb-1 text-gray-500">Severidade Anterior: <span className="text-gray-300">{hist.severidadeAnterior}</span></p>

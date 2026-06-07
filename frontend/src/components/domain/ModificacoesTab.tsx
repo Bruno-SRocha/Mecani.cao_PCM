@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/solicitacoes-modificacao";
 import type { ComponenteComDesgaste } from "@/lib/api/componentes";
 import type { NivelUsuario } from "@/types/usuario.types";
+import { formatToBrasilia } from "@/lib/time";
 
 interface ModificacoesTabProps {
   equipamentoId: string;
@@ -215,7 +216,7 @@ export default function ModificacoesTab({
                       </span>
                     </div>
                     <p className="text-[11px]" style={{ color: "#475569" }}>
-                      Solicitada em: {new Date(sol.criadoEm).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      Solicitada em: {formatToBrasilia(sol.criadoEm, { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })} BRT
                     </p>
                   </div>
 
@@ -345,7 +346,7 @@ export default function ModificacoesTab({
                     </p>
                     {sol.dataImplementacao && (
                       <p className="text-[11px] text-teal-500 mt-2 font-medium">
-                        Homologado em: {new Date(sol.dataImplementacao).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        Homologado em: {formatToBrasilia(sol.dataImplementacao, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} BRT
                       </p>
                     )}
                   </div>
