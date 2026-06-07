@@ -15,6 +15,7 @@ import type {
   Equipamento,
   CreateEquipamentoRequest,
   UpdateEquipamentoRequest,
+  StatusEquipamento,
 } from "@/types/equipamento.types";
 
 /** URL base da API back-end */
@@ -167,4 +168,79 @@ export async function deleteEquipamentoApi(id: string): Promise<void> {
       errorData?.error ?? `Erro ao remover equipamento (status ${response.status})`
     );
   }
+}
+
+export interface BulkStatusUpdateResponse {
+  sucesso: string[];
+  falhas: {
+    id: string;
+    nome: string;
+    tag: string;
+    motivo: string;
+  }[];
+}
+
+export interface EquipamentoAuditoria {
+  id: string;
+  equipamentoId: string;
+  usuarioId: string | null;
+  usuario: {
+    id: string;
+    nome: string;
+    nomeUsuario: string;
+  } | null;
+  statusAnterior: StatusEquipamento;
+  statusNovo: StatusEquipamento;
+  detalhes: string | null;
+  criadoEm: string;
+}
+
+/**
+ * Altera o status de múltiplos equipamentos em lote.
+ *
+ * POST /api/equipamentos/bulk-status
+ * Restrito a ADMIN e GESTOR.
+ */
+export async function bulkUpdateEquipamentosStatusApi(
+  ids: string[],
+  status: StatusEquipamento
+): Promise<BulkStatusUpdateResponse> {
+  const response = await fetch(`${API_BASE}/equipamentos/bulk-status`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ ids, status }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.error ?? `Erro ao atualizar status dos equipamentos em lote (status ${response.status})`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Busca o histórico de auditoria de alterações de status de um equipamento.
+ *
+ * GET /api/equipamentos/:id/auditoria
+ * Acessível por todos os perfis autenticados.
+ */
+export async function getEquipamentoAuditoriaApi(
+  id: string
+): Promise<EquipamentoAuditoria[]> {
+  const response = await fetch(`${API_BASE}/equipamentos/${id}/auditoria`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.error ?? `Erro ao buscar histórico de auditoria (status ${response.status})`
+    );
+  }
+
+  return response.json();
 }

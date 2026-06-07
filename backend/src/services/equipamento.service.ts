@@ -19,6 +19,10 @@ import {
   Equipamento,
   StatusEquipamento,
 } from "../entities/equipamento.entity";
+import { AppDataSource } from "../config/database";
+import { OrdemManutencao, StatusOM } from "../entities/ordemmanutencao.entity";
+import { EquipamentoAuditoria } from "../entities/equipamento-auditoria.entity";
+import { EquipamentoAuditoriaRepository } from "../repositories/equipamento-auditoria.repository";
 
 /**
  * Interface de dados para criação de um novo equipamento.
@@ -52,6 +56,19 @@ interface UpdateEquipamentoData {
   status?: StatusEquipamento;
   dataInstalacao?: string;
   descricao?: string;
+}
+
+/**
+ * Interface de resultado para atualização em lote
+ */
+export interface BulkUpdateResult {
+  sucesso: string[];
+  falhas: {
+    id: string;
+    nome: string;
+    tag: string;
+    motivo: string;
+  }[];
 }
 
 /**
@@ -134,14 +151,18 @@ export async function createEquipamentoService(
  * Se a TAG for alterada, valida se a nova TAG não está em uso
  * por outro equipamento no sistema.
  *
+ * Se o status for alterado, valida se o equipamento não possui OMs abertas.
+ *
  * @param id - UUID do equipamento a atualizar
  * @param data - Campos a serem atualizados (parcial)
+ * @param editorId - ID do usuário realizando a edição
  * @returns O equipamento atualizado
- * @throws Error se o equipamento não for encontrado ou TAG duplicada
+ * @throws Error se o equipamento não for encontrado, TAG duplicada ou possuir OM aberta
  */
 export async function updateEquipamentoService(
   id: string,
-  data: UpdateEquipamentoData
+  data: UpdateEquipamentoData,
+  editorId?: string
 ): Promise<Equipamento> {
   /* Busca o equipamento existente */
   const equipamento = await EquipamentoRepository.findOne({ where: { id } });
@@ -155,6 +176,27 @@ export async function updateEquipamentoService(
     const tagEmUso = await EquipamentoRepository.findByTag(data.tag);
     if (tagEmUso) {
       throw new Error("Já existe um equipamento com esta TAG.");
+    }
+  }
+
+  const statusAnterior = equipamento.status;
+  const statusNovo = data.status;
+  const statusAlterado = statusNovo !== undefined && statusNovo !== statusAnterior;
+
+  /* Se está alterando o status, valida se há OM aberta somente se o novo status for OPERANDO */
+  if (statusAlterado && statusNovo === StatusEquipamento.OPERANDO) {
+    const openOM = await AppDataSource.getRepository(OrdemManutencao)
+      .createQueryBuilder("om")
+      .where("om.equipamentoId = :equipamentoId", { equipamentoId: id })
+      .andWhere("om.status NOT IN (:...closedStatuses)", {
+        closedStatuses: [StatusOM.CONCLUIDA, StatusOM.CANCELADA],
+      })
+      .getOne();
+
+    if (openOM) {
+      throw new Error(
+        `Não é possível alterar o status do equipamento pois ele está vinculado a uma ordem de manutenção aberta (${openOM.codigo}).`
+      );
     }
   }
 
@@ -172,7 +214,117 @@ export async function updateEquipamentoService(
   }
   if (data.descricao !== undefined) equipamento.descricao = data.descricao;
 
-  return EquipamentoRepository.save(equipamento);
+  const equipamentoSalvo = await EquipamentoRepository.save(equipamento);
+
+  /* Se o status foi alterado e o editorId foi passado, registra auditoria */
+  if (statusAlterado && editorId && statusNovo) {
+    const auditoria = EquipamentoAuditoriaRepository.create({
+      equipamentoId: id,
+      usuarioId: editorId,
+      statusAnterior,
+      statusNovo,
+      detalhes: "Alteração individual",
+    });
+    await EquipamentoAuditoriaRepository.save(auditoria);
+  }
+
+  return equipamentoSalvo;
+}
+
+/**
+ * Altera o status de múltiplos equipamentos em lote.
+ *
+ * Valida a existência de ordens de manutenção abertas para cada item.
+ *
+ * @param ids - Array de IDs dos equipamentos
+ * @param status - Novo status a ser aplicado
+ * @param editorId - ID do usuário que solicitou a alteração
+ * @returns Objeto contendo os IDs atualizados com sucesso e a lista de falhas com motivos
+ */
+export async function bulkUpdateEquipamentoStatusService(
+  ids: string[],
+  status: StatusEquipamento,
+  editorId: string
+): Promise<BulkUpdateResult> {
+  const sucesso: string[] = [];
+  const falhas: { id: string; nome: string; tag: string; motivo: string }[] = [];
+
+  for (const id of ids) {
+    try {
+      const equipamento = await EquipamentoRepository.findOne({ where: { id } });
+      if (!equipamento) {
+        falhas.push({
+          id,
+          nome: "Desconhecido",
+          tag: "N/A",
+          motivo: "Equipamento não encontrado.",
+        });
+        continue;
+      }
+
+      // Validação de OM aberta (somente se o novo status for OPERANDO)
+      if (status === StatusEquipamento.OPERANDO) {
+        const openOM = await AppDataSource.getRepository(OrdemManutencao)
+          .createQueryBuilder("om")
+          .where("om.equipamentoId = :equipamentoId", { equipamentoId: id })
+          .andWhere("om.status NOT IN (:...closedStatuses)", {
+            closedStatuses: [StatusOM.CONCLUIDA, StatusOM.CANCELADA],
+          })
+          .getOne();
+
+        if (openOM) {
+          falhas.push({
+            id,
+            nome: equipamento.nome,
+            tag: equipamento.tag,
+            motivo: `Possui ordem de manutenção aberta (${openOM.codigo}).`,
+          });
+          continue;
+        }
+      }
+
+      const statusAnterior = equipamento.status;
+      const statusNovo = status;
+      const statusAlterado = statusNovo !== statusAnterior;
+
+      equipamento.status = statusNovo;
+      await EquipamentoRepository.save(equipamento);
+
+      if (statusAlterado) {
+        const auditoria = EquipamentoAuditoriaRepository.create({
+          equipamentoId: id,
+          usuarioId: editorId,
+          statusAnterior,
+          statusNovo,
+          detalhes: "Alteração em lote",
+        });
+        await EquipamentoAuditoriaRepository.save(auditoria);
+      }
+
+      sucesso.push(id);
+    } catch (error) {
+      falhas.push({
+        id,
+        nome: "Desconhecido",
+        tag: "N/A",
+        motivo: error instanceof Error ? error.message : "Erro desconhecido.",
+      });
+    }
+  }
+
+  return { sucesso, falhas };
+}
+
+/**
+ * Retorna o histórico de auditoria de alterações de status de um equipamento.
+ *
+ * @param equipamentoId - ID do equipamento
+ * @returns Array de registros de auditoria
+ */
+export async function listEquipamentoAuditoriaService(
+  equipamentoId: string
+): Promise<EquipamentoAuditoria[]> {
+  return EquipamentoAuditoriaRepository.findByEquipamentoId(equipamentoId);
 }
 
 /**

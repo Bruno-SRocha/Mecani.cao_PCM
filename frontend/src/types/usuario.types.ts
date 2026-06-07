@@ -25,6 +25,10 @@ export interface Usuario {
   nomeUsuario: string; // Nome de login (único)
   nome: string; // Nome completo para exibição
   nivel: NivelUsuario; // Perfil de acesso
+  email: string; // E-mail corporativo
+  primeiroAcesso: boolean; // Indica se é primeiro acesso
+  criadoPor?: string; // Admin que cadastrou o usuário
+  criadoEm?: string; // Data e hora do cadastro
 }
 
 /**

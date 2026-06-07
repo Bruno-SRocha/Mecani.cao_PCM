@@ -183,7 +183,7 @@ export default function ReporteSubstituicaoModal({
             <p className="text-[12px]" style={{ color: "#64748B" }}>
               {componente.tipo.replace(/_/g, " ")} ·{" "}
               {componente.horasOperacionais.toLocaleString("pt-BR")} h operadas ·{" "}
-              {componente.desgastePct.toFixed(1)}% desgaste
+              {(componente.desgastePct ?? (componente.vidaUtilNominal > 0 ? (componente.horasOperacionais / componente.vidaUtilNominal) * 100 : 0)).toFixed(1)}% desgaste
             </p>
           </div>
         </div>

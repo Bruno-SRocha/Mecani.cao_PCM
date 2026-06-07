@@ -115,12 +115,16 @@ export default function Sidebar() {
     const stored = localStorage.getItem("usuario");
     if (stored) {
       try {
-        setUsuario(JSON.parse(stored));
+        const u = JSON.parse(stored);
+        setUsuario(u);
+        if (u.primeiroAcesso && pathname !== "/alterar-senha") {
+          router.push("/alterar-senha");
+        }
       } catch {
         /* Ignora JSON inválido */
       }
     }
-  }, []);
+  }, [pathname, router]);
 
   /**
    * Busca e atualiza o contador de reportes pendentes.
@@ -379,6 +383,55 @@ export default function Sidebar() {
         className="px-3 py-4 border-t"
         style={{ borderColor: "var(--border-subtle)" }}
       >
+        {/* Link Usuários (Apenas ADMIN, separado e com cor de fundo distinta) */}
+        {usuario?.nivel === "ADMIN" && (
+          <a
+            href="/usuarios"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-bold transition-all duration-200 relative group min-h-[48px] mb-3"
+            style={{
+              color: pathname === "/usuarios" ? "#FFFFFF" : "#14B8A6",
+              background: pathname === "/usuarios"
+                ? "rgba(20, 184, 166, 0.25)"
+                : "rgba(20, 184, 166, 0.08)",
+              border: "1px solid rgba(20, 184, 166, 0.25)",
+            }}
+            onMouseEnter={(e) => {
+              if (pathname !== "/usuarios") {
+                e.currentTarget.style.background = "rgba(20, 184, 166, 0.15)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (pathname !== "/usuarios") {
+                e.currentTarget.style.background = "rgba(20, 184, 166, 0.08)";
+              }
+            }}
+          >
+            {/* Indicador lateral teal do link ativo */}
+            {pathname === "/usuarios" && (
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full"
+                style={{ background: "#14B8A6" }}
+              />
+            )}
+
+            <svg
+              className="w-[22px] h-[22px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20c-2.034 0-3.937-.53-5.589-1.46M15 15.703a9.004 9.004 0 0 0-3.375-1.742m-1.625-2.07a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM18.75 8a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"
+              />
+            </svg>
+
+            <span className="flex-1 leading-tight">Usuários</span>
+          </a>
+        )}
+
         {/* Relógio/Data de Brasília (UTC-3) */}
         <div className="flex flex-col gap-0.5 mb-3 px-4 py-2.5 rounded-xl border border-dashed"
           style={{

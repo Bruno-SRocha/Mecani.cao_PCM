@@ -1,30 +1,29 @@
 /**
  * Controller: Autenticação (Auth)
  *
- * Handlers HTTP para as rotas de autenticação.
+ * Handlers HTTP para as rotas de autenticação e gestão de usuários.
  * Responsável por receber as requisições, validar os inputs,
  * chamar os services adequados e retornar as respostas HTTP.
  *
  * Segue o padrão:
  *   Route → Controller → Service → Repository → Banco
- *
- * Cada handler trata seus próprios erros e retorna status codes
- * HTTP semânticamente corretos.
  */
 
 import { Request, Response } from "express";
-import { loginService, createUserService, listUsersService } from "../services/auth.service";
+import {
+  loginService,
+  createUserService,
+  listUsersService,
+  updateUserService,
+  deleteUserService,
+  changePasswordService,
+} from "../services/auth.service";
 
 /**
  * POST /api/auth/login
  *
  * Autentica um usuário com nome de usuário e senha.
  * Retorna o token JWT e os dados do usuário logado.
- *
- * Body esperado: { nomeUsuario: string, senha: string }
- * Resposta 200:  { token: string, usuario: { id, nomeUsuario, nome, nivel } }
- * Resposta 400:  { error: string } — campos ausentes
- * Resposta 401:  { error: string } — credenciais inválidas
  */
 export async function loginController(req: Request, res: Response): Promise<void> {
   try {
@@ -52,48 +51,46 @@ export async function loginController(req: Request, res: Response): Promise<void
  * POST /api/auth/register
  *
  * Cria um novo usuário no sistema.
- * Normalmente restrito a administradores (middleware de auth).
- *
- * Body esperado: { nomeUsuario: string, senha: string, nome: string, nivel?: string }
- * Resposta 201:  Dados do usuário criado (sem senha)
- * Resposta 400:  { error: string } — validação falhou
- * Resposta 409:  { error: string } — usuário já existe
+ * Restrito a administradores (middleware de auth).
  */
 export async function registerController(req: Request, res: Response): Promise<void> {
   try {
-    const { nomeUsuario, senha, nome, nivel } = req.body;
+    const { nomeUsuario, nome, email, nivel } = req.body;
 
     /* Validação de campos obrigatórios */
-    if (!nomeUsuario || !senha || !nome) {
+    if (!nomeUsuario || !nome || !email) {
       res.status(400).json({
-        error: "Campos obrigatórios: nomeUsuario, senha, nome.",
+        error: "Campos obrigatórios: nomeUsuario, nome, email.",
       });
       return;
     }
 
-    /* Validação de tamanho mínimo da senha */
-    if (senha.length < 6) {
-      res.status(400).json({
-        error: "A senha deve ter no mínimo 6 caracteres.",
-      });
-      return;
-    }
+    const administradorNome = req.userNomeUsuario || "Admin";
 
     /* Chama o service de criação de usuário */
-    const user = await createUserService({ nomeUsuario, senha, nome, nivel });
+    const { user, senhaGerada } = await createUserService({
+      nomeUsuario,
+      nome,
+      email,
+      nivel,
+      criadoPor: administradorNome,
+    });
 
-    /* Retorna 201 Created com os dados do usuário (sem senha) */
+    /* Retorna 201 Created com os dados do usuário (sem senha) e a senha gerada */
     res.status(201).json({
       id: user.id,
       nomeUsuario: user.nomeUsuario,
       nome: user.nome,
+      email: user.email,
       nivel: user.nivel,
+      primeiroAcesso: user.primeiroAcesso,
+      criadoPor: user.criadoPor,
       criadoEm: user.criadoEm,
+      senhaGerada, // Retornada temporariamente para exibição na interface do Admin
     });
   } catch (error) {
-    /* Username duplicado retorna 409 Conflict */
     const message = error instanceof Error ? error.message : "Erro ao criar usuário.";
-    const statusCode = message.includes("já está em uso") ? 409 : 500;
+    const statusCode = message.includes("já está em uso") ? 409 : 400;
 
     res.status(statusCode).json({ error: message });
   }
@@ -104,8 +101,6 @@ export async function registerController(req: Request, res: Response): Promise<v
  *
  * Lista todos os usuários do sistema (sem senhas).
  * Restrito a administradores (middleware de auth/autorização).
- *
- * Resposta 200: Array de usuários
  */
 export async function listUsersController(_req: Request, res: Response): Promise<void> {
   try {
@@ -115,6 +110,88 @@ export async function listUsersController(_req: Request, res: Response): Promise
     res.status(500).json({
       error: "Erro ao listar usuários.",
       details: error instanceof Error ? error.message : undefined,
+    });
+  }
+}
+
+/**
+ * PUT /api/auth/users/:id
+ *
+ * Atualiza um usuário existente.
+ * Restrito a administradores (middleware de auth/autorização).
+ */
+export async function updateUserController(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { nome, email, nivel } = req.body;
+
+    if (!nome || !email || !nivel) {
+      res.status(400).json({ error: "Campos obrigatórios: nome, email, nivel." });
+      return;
+    }
+
+    const user = await updateUserService(id as string, { nome, email, nivel });
+
+    res.status(200).json({
+      id: user.id,
+      nomeUsuario: user.nomeUsuario,
+      nome: user.nome,
+      email: user.email,
+      nivel: user.nivel,
+      primeiroAcesso: user.primeiroAcesso,
+      criadoPor: user.criadoPor,
+      criadoEm: user.criadoEm,
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Erro ao atualizar usuário.",
+    });
+  }
+}
+
+/**
+ * DELETE /api/auth/users/:id
+ *
+ * Exclui um usuário do sistema.
+ * Restrito a administradores (middleware de auth/autorização).
+ */
+export async function deleteUserController(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    await deleteUserService(id as string);
+    res.status(200).json({ message: "Usuário excluído com sucesso." });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Erro ao excluir usuário.",
+    });
+  }
+}
+
+/**
+ * POST /api/auth/change-password
+ *
+ * Altera a senha do usuário autenticado no primeiro acesso (ou qualquer momento).
+ */
+export async function changePasswordController(req: Request, res: Response): Promise<void> {
+  try {
+    const { senhaAtual, novaSenha } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: "Usuário não autenticado." });
+      return;
+    }
+
+    if (!senhaAtual || !novaSenha) {
+      res.status(400).json({ error: "Informe a senha atual e a nova senha." });
+      return;
+    }
+
+    await changePasswordService(userId, senhaAtual, novaSenha);
+    res.status(200).json({ message: "Senha alterada com sucesso." });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Erro ao alterar senha.",
     });
   }
 }

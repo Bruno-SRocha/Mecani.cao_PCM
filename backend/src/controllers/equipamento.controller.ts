@@ -20,6 +20,8 @@ import {
   createEquipamentoService,
   updateEquipamentoService,
   deleteEquipamentoService,
+  bulkUpdateEquipamentoStatusService,
+  listEquipamentoAuditoriaService,
 } from "../services/equipamento.service";
 
 /**
@@ -125,7 +127,7 @@ export async function updateEquipamentoController(
 ): Promise<void> {
   try {
     const id = req.params.id as string;
-    const equipamento = await updateEquipamentoService(id, req.body);
+    const equipamento = await updateEquipamentoService(id, req.body, req.userId);
     res.status(200).json(equipamento);
   } catch (error) {
     const message =
@@ -136,8 +138,73 @@ export async function updateEquipamentoController(
       ? 404
       : message.includes("TAG")
       ? 409
+      : message.includes("ordem de manutenção")
+      ? 400
       : 500;
     res.status(statusCode).json({ error: message });
+  }
+}
+
+/**
+ * POST /api/equipamentos/bulk-status
+ *
+ * Altera o status de múltiplos equipamentos em lote.
+ * Restrito a ADMIN e GESTOR.
+ *
+ * Body esperado: { ids: string[], status: StatusEquipamento }
+ * Resposta 200: Objeto com sucesso e falhas
+ */
+export async function bulkUpdateStatusController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const { ids, status } = req.body;
+    const editorId = req.userId;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0 || !status) {
+      res.status(400).json({
+        error: "Campos obrigatórios: ids (array não vazio) e status.",
+      });
+      return;
+    }
+
+    if (!editorId) {
+      res.status(401).json({ error: "Usuário não autenticado." });
+      return;
+    }
+
+    const resultado = await bulkUpdateEquipamentoStatusService(ids, status, editorId);
+    res.status(200).json(resultado);
+  } catch (error) {
+    res.status(500).json({
+      error: "Erro ao atualizar equipamentos em lote.",
+      details: error instanceof Error ? error.message : undefined,
+    });
+  }
+}
+
+/**
+ * GET /api/equipamentos/:id/auditoria
+ *
+ * Busca o histórico de auditoria (alterações de status) de um equipamento.
+ * Acessível por todos os perfis autenticados.
+ *
+ * Resposta 200: Array de registros de auditoria
+ */
+export async function listEquipamentoAuditoriaController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    const logs = await listEquipamentoAuditoriaService(id);
+    res.status(200).json(logs);
+  } catch (error) {
+    res.status(500).json({
+      error: "Erro ao buscar histórico de auditoria do equipamento.",
+      details: error instanceof Error ? error.message : undefined,
+    });
   }
 }
 

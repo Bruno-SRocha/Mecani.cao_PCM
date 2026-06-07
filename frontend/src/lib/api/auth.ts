@@ -1,28 +1,17 @@
 /**
- * Serviço de API — Autenticação
+ * Serviço de API — Autenticação e Gestão de Usuários
  *
  * Centraliza as chamadas HTTP ao back-end relacionadas ao módulo
- * de autenticação (login/logout). Utiliza fetch nativo do browser.
- *
- * A URL base da API é configurada via variável de ambiente
- * NEXT_PUBLIC_API_URL para facilitar a troca entre ambientes
- * (desenvolvimento, staging, produção).
+ * de autenticação e gerenciamento de usuários.
  */
 
-import type { LoginRequest, LoginResponse } from "@/types/usuario.types";
+import type { LoginRequest, LoginResponse, Usuario, NivelUsuario } from "@/types/usuario.types";
 
 /** URL base da API back-end */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
 
 /**
  * Realiza a autenticação do usuário no back-end.
- *
- * Envia as credenciais (nomeUsuario + senha) para a rota POST /auth/login
- * e retorna o token JWT + dados do usuário em caso de sucesso.
- *
- * @param credentials - Objeto com nomeUsuario e senha
- * @returns Promise com o token JWT e dados do usuário autenticado
- * @throws Error com mensagem descritiva em caso de falha
  */
 export async function loginApi(credentials: LoginRequest): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE}/auth/login`, {
@@ -31,7 +20,6 @@ export async function loginApi(credentials: LoginRequest): Promise<LoginResponse
     body: JSON.stringify(credentials),
   });
 
-  /* Se a resposta não for OK, extrai a mensagem de erro da API */
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
     throw new Error(
@@ -40,4 +28,117 @@ export async function loginApi(credentials: LoginRequest): Promise<LoginResponse
   }
 
   return response.json();
+}
+
+/**
+ * Retorna todos os usuários cadastrados.
+ * Requer token JWT de ADMIN.
+ */
+export async function listUsersApi(token: string): Promise<Usuario[]> {
+  const response = await fetch(`${API_BASE}/auth/users`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao carregar usuários.");
+  }
+
+  return response.json();
+}
+
+/**
+ * Cria um novo usuário no sistema.
+ * Requer token JWT de ADMIN.
+ */
+export async function createUserApi(
+  token: string,
+  data: { nomeUsuario: string; nome: string; email: string; nivel: NivelUsuario }
+): Promise<Usuario & { senhaGerada: string }> {
+  const response = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao criar usuário.");
+  }
+
+  return response.json();
+}
+
+/**
+ * Atualiza um usuário existente.
+ * Requer token JWT de ADMIN.
+ */
+export async function updateUserApi(
+  token: string,
+  id: string,
+  data: { nome: string; email: string; nivel: NivelUsuario }
+): Promise<Usuario> {
+  const response = await fetch(`${API_BASE}/auth/users/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao atualizar usuário.");
+  }
+
+  return response.json();
+}
+
+/**
+ * Exclui um usuário.
+ * Requer token JWT de ADMIN.
+ */
+export async function deleteUserApi(token: string, id: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/users/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao excluir usuário.");
+  }
+}
+
+/**
+ * Altera a senha do próprio usuário logado.
+ * Requer token JWT.
+ */
+export async function changePasswordApi(
+  token: string,
+  data: { senhaAtual: string; novaSenha: string }
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/auth/change-password`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error ?? "Erro ao alterar senha.");
+  }
 }

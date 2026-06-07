@@ -35,6 +35,9 @@ export async function seedAdminUser(): Promise<void> {
     senha: "admin@123",
     nome: "Administrador do Sistema",
     nivel: NivelUsuario.ADMIN,
+    email: "admin@mecanicao.com.br",
+    primeiroAcesso: false,
+    criadoPor: "Sistema",
   });
 
   await UserRepository.save(admin);

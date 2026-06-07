@@ -77,6 +77,21 @@ export class User {
   })
   nivel: NivelUsuario;
 
+  @Column({ length: 120, unique: true, nullable: true })
+  email: string;
+
+  /**
+   * Indica se é o primeiro acesso do usuário (exige troca de senha).
+   */
+  @Column({ type: "boolean", default: true })
+  primeiroAcesso: boolean;
+
+  /**
+   * Registra qual Admin realizou o cadastro.
+   */
+  @Column({ length: 120, nullable: true })
+  criadoPor: string;
+
   /**
    * Data de criação do registro (preenchida automaticamente).
    */
@@ -105,3 +120,4 @@ export class User {
     }
   }
 }
+

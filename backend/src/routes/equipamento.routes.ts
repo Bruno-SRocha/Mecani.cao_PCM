@@ -26,6 +26,8 @@ import {
   createEquipamentoController,
   updateEquipamentoController,
   deleteEquipamentoController,
+  bulkUpdateStatusController,
+  listEquipamentoAuditoriaController,
 } from "../controllers/equipamento.controller";
 import { getHistoricoEquipamentoController } from "../controllers/reporte-substituicao.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
@@ -57,6 +59,12 @@ router.get("/", listEquipamentosController);
 router.get("/:equipamentoId/historico-substituicoes", getHistoricoEquipamentoController);
 
 /**
+ * GET /api/equipamentos/:id/auditoria
+ * Retorna o histórico de auditoria (alterações de status) do equipamento.
+ */
+router.get("/:id/auditoria", listEquipamentoAuditoriaController);
+
+/**
  * GET /api/equipamentos/:id
  * Busca um equipamento específico pelo ID com componentes detalhados.
  */
@@ -66,6 +74,12 @@ router.get("/:id", getEquipamentoController);
    Rotas de escrita — restritas a ADMIN e GESTOR
    Técnicos só podem visualizar, não podem modificar o cadastro.
    --------------------------------------------------------------- */
+
+/**
+ * POST /api/equipamentos/bulk-status
+ * Altera o status de múltiplos equipamentos em lote.
+ */
+router.post("/bulk-status", authorize("ADMIN", "GESTOR"), bulkUpdateStatusController);
 
 /**
  * POST /api/equipamentos

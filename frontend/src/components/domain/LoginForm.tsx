@@ -59,8 +59,12 @@ export default function LoginForm() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
-      /* Redireciona para o dashboard (área privada) */
-      window.location.href = "/dashboard";
+      /* Redireciona de acordo com o primeiro acesso */
+      if (data.usuario.primeiroAcesso) {
+        window.location.href = "/alterar-senha";
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (error) {
       setErro(
         error instanceof Error
