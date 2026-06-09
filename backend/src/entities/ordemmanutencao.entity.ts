@@ -146,6 +146,12 @@ export class OrdemManutencao {
   @Column({ type: "text", nullable: true })
   observacoes: string;
 
+  /**
+   * Tempo estimado para conclusão da manutenção em horas.
+   */
+  @Column("float", { nullable: true })
+  tempoEstimado?: number;
+
   /* ---------------------------------------------------------------
      Relacionamentos
      --------------------------------------------------------------- */

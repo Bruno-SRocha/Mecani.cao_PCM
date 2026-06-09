@@ -97,6 +97,12 @@ export class Componente {
   status: string;
 
   /**
+   * Custo unitário do componente (opcional) para análises financeiras/TCO.
+   */
+  @Column("float", { nullable: true })
+  custoUnitario?: number;
+
+  /**
    * Data de criação do registro (preenchida automaticamente).
    */
   @CreateDateColumn()

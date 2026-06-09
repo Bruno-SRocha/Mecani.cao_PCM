@@ -99,6 +99,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.CRITICA,
         status: StatusOM.EM_EXECUCAO,
         dataInicioPrevisto: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h atrás
+        tempoEstimado: 6,
         materiaisNecessarios: [
           "Selo Mecânico John Crane T1",
           "Junta de Vedação PTFE",
@@ -120,6 +121,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.ALTA,
         status: StatusOM.ABERTA,
         dataInicioPrevisto: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // em 2 dias
+        tempoEstimado: 4,
         materiaisNecessarios: [
           "Graxa Shell Gadus S2 V220",
           "Rolamento FAG 6208",
@@ -141,6 +143,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.ALTA,
         status: StatusOM.AGUARDANDO_INICIO,
         dataInicioPrevisto: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // amanhã
+        tempoEstimado: 3,
         materiaisNecessarios: [
           "Correia Gates 3VX 900",
           "Correia Gates 3VX 900 (reserva)",
@@ -162,6 +165,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.MEDIA,
         status: StatusOM.ABERTA,
         dataInicioPrevisto: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // em 3 dias
+        tempoEstimado: 2,
         materiaisNecessarios: [
           "Analisador de vibração SKF CMAS 100",
           "Massa de balanceamento (kit)",
@@ -182,6 +186,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.MEDIA,
         status: StatusOM.PAUSADA,
         dataInicioPrevisto: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // ontem
+        tempoEstimado: 8,
         materiaisNecessarios: [
           "Óleo Mobil SHC Gear 320",
           "Kit coleta de amostra de óleo",
@@ -203,6 +208,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.BAIXA,
         status: StatusOM.CONCLUIDA,
         dataInicioPrevisto: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 dias atrás
+        tempoEstimado: 5,
         materiaisNecessarios: [
           "Primer anticorrosivo Rust-Oleum",
           "Tinta de acabamento industrial cinza",
@@ -224,6 +230,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.CRITICA,
         status: StatusOM.ABERTA,
         dataInicioPrevisto: new Date(), // agora
+        tempoEstimado: 24,
         materiaisNecessarios: [
           "Engrenagem Helicoidal Z1 (sobressalente)",
           "Rolamento SKF 24060",
@@ -246,6 +253,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.BAIXA,
         status: StatusOM.CONCLUIDA,
         dataInicioPrevisto: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 dias atrás
+        tempoEstimado: 1.5,
         materiaisNecessarios: [
           "Câmera termográfica FLIR T540",
           "EPI elétrico NR-10",
@@ -266,6 +274,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.ALTA,
         status: StatusOM.ABERTA,
         dataInicioPrevisto: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // em 4 dias
+        tempoEstimado: 4,
         materiaisNecessarios: [
           "Separador Donaldson P-55 (original)",
           "Junta de vedação 4\" NBR",
@@ -287,6 +296,7 @@ async function seedOrdensManutencao() {
         prioridade: PrioridadeOM.MEDIA,
         status: StatusOM.CANCELADA,
         dataInicioPrevisto: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 dias atrás
+        tempoEstimado: 12,
         materiaisNecessarios: [
           "Massa de balanceamento (kit completo)",
           "Analisador de vibração portátil",

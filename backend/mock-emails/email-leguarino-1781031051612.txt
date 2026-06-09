@@ -1,0 +1,19 @@
+Para: leguarino@mecanicao.com.br
+Assunto: Bem-vindo ao Mecâni.cão PCM - Suas Credenciais de Acesso
+Data: 09/06/2026, 15:50:51
+
+Olá Leandro Guarino,
+
+Sua conta de colaborador foi criada com sucesso no sistema centralizado de controle de manutenção Mecâni.cão PCM!
+
+Aqui estão as suas credenciais de acesso:
+---------------------------------------------
+Usuário: leguarino
+Senha Temporária: *[Rv)3/i=8)C
+Link de Acesso: http://localhost:3000/login
+---------------------------------------------
+
+Atenção: Por motivos de segurança, ao realizar o primeiro login com esta senha temporária, você será obrigatoriamente redirecionado para a tela de troca de senha para definir a sua senha pessoal definitiva.
+
+Atenciosamente,
+Equipe de TI Mecâni.cão PCM

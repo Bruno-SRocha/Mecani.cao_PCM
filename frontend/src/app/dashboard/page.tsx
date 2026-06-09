@@ -798,43 +798,78 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Módulos Futuros/Planejados */}
+        {/* Módulos Futuros/Planejados -> BI Preview */}
         <div className="lg:col-span-1 glass-card p-space-lg flex flex-col justify-between" style={{ borderRadius: "14px" }}>
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "rgba(232,132,44,0.12)" }}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#E8842C" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-                </svg>
-              </div>
-              <h2 className="text-[16px] font-bold text-txt-primary">Próximos Módulos</h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {[
-                { label: "Relatórios & BI", desc: "Relatórios de confiabilidade (MTBF, MTTR) e custos" },
-                { label: "Histórico de Falhas", desc: "Registro detalhado de falhas mecânicas com FMEA" },
-                { label: "Estoque de Peças", desc: "Controle e previsão de estoque de peças críticas" },
-              ].map((mod) => (
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
                 <div
-                  key={mod.label}
-                  className="info-sub-card flex items-start gap-3"
-                  style={{ background: "var(--bg-sub-card)", borderColor: "var(--border-sub-card)" }}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{ background: "rgba(232,132,44,0.12)" }}
                 >
-                  <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: "#334155" }} />
-                  <div>
-                    <p className="text-[13px] font-semibold text-txt-secondary">{mod.label}</p>
-                    <p className="text-[12px] mt-0.5 text-txt-muted">{mod.desc}</p>
-                  </div>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#E8842C" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                  </svg>
                 </div>
-              ))}
+                <h2 className="text-[16px] font-bold text-txt-primary">Painel de BI & PCM</h2>
+              </div>
+              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-green-500/10 text-green-500 animate-pulse">
+                Ativo
+              </span>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <div className="p-3 rounded-lg border" style={{ background: "var(--bg-sub-card)", borderColor: "var(--border-sub-card)" }}>
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="text-[12px] font-semibold text-txt-secondary">Disponibilidade Global</span>
+                  <span className="text-[12px] font-bold text-green-500 font-mono">95.5%</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800">
+                  <div className="h-full rounded-full bg-green-500" style={{ width: "95.5%" }} />
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg border" style={{ background: "var(--bg-sub-card)", borderColor: "var(--border-sub-card)" }}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[12px] font-semibold text-txt-secondary">Tempo de Resposta (MTTR)</span>
+                  <span className="text-[12px] font-bold text-txt-primary font-mono">4.2h</span>
+                </div>
+                <p className="text-[11px] text-txt-muted">Média ponderada de reparo das corretivas</p>
+              </div>
+
+              <div className="p-3 rounded-lg border" style={{ background: "var(--bg-sub-card)", borderColor: "var(--border-sub-card)" }}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[12px] font-semibold text-txt-secondary">Carga de Trabalho (Backlog)</span>
+                  <span className="text-[12px] font-bold text-orange font-mono">24h / 1.5 dias</span>
+                </div>
+                <p className="text-[11px] text-txt-muted">Carga total programada para execução</p>
+              </div>
             </div>
           </div>
-          <p className="text-[12px] mt-5 pt-4 text-txt-muted border-t" style={{ borderColor: "var(--border-subtle)" }}>
-            Sistema em desenvolvimento ativo — novas funcionalidades são adicionadas a cada sprint.
-          </p>
+          
+          <div className="mt-5">
+            <button
+              onClick={() => router.push("/relatorios")}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-bold text-white transition-all cursor-pointer border-0"
+              style={{
+                background: "var(--orange)",
+                boxShadow: "0 4px 12px rgba(232, 132, 44, 0.2)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--orange-dark)";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--orange)";
+                e.currentTarget.style.transform = "none";
+              }}
+            >
+              Ver Relatórios & BI
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>

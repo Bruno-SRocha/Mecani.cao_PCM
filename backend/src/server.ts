@@ -33,8 +33,11 @@ import {
 import { seedAdminUser } from "./config/seed";
 import { seedEquipamentos } from "./config/seed-equipamentos";
 import { seedReportes } from "./config/seed-reportes";
+import { seedOrdensManutencao } from "./config/seed-ordens-manutencao";
+import { seedDiagnosticos } from "./config/seed-diagnosticos";
 import { startBackgroundWearCalculator } from "./services/background-wear.service";
 import alertaRoutes from "./routes/alerta.routes";
+import biRoutes from "./routes/bi.routes";
 
 const app = express();
 
@@ -89,6 +92,7 @@ app.use("/api/reportes", reporteGlobalRouter);
 app.use("/api/equipamentos/:equipamentoId/solicitacoes-modificacao", solicitacaoModificacaoEquipamentoRouter);
 app.use("/api/solicitacoes-modificacao", solicitacaoModificacaoGlobalRouter);
 app.use("/api/alertas", alertaRoutes);
+app.use("/api/bi", biRoutes);
 
 /* ---------------------------------------------------------------
    Inicialização: Conexão com banco + Start do servidor
@@ -114,6 +118,12 @@ AppDataSource.initialize()
 
     /* Cria usuários de teste e reportes de demonstração se não existirem */
     await seedReportes();
+
+    /* Cria ordens de manutenção de demonstração se não existirem */
+    await seedOrdensManutencao();
+
+    /* Cria diagnósticos de demonstração se não existirem */
+    await seedDiagnosticos();
 
     /* Inicia o serviço de cálculo de desgaste em background */
     startBackgroundWearCalculator();

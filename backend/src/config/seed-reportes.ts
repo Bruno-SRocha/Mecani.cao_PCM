@@ -17,7 +17,7 @@ import { NivelUsuario } from "../entities/user.entity";
 import { EquipamentoRepository } from "../repositories/equipamento.repository";
 import { AppDataSource } from "../config/database";
 import { Componente } from "../entities/componente.entity";
-import { ReporteSubstituicao, StatusReporte } from "../entities/reporte-substituicao.entity";
+import { ReporteSubstituicao, StatusReporte, MotivoTroca } from "../entities/reporte-substituicao.entity";
 
 function daysAgo(n: number): Date {
   return new Date(Date.now() - n * 24 * 60 * 60 * 1000);
@@ -99,12 +99,6 @@ export async function seedReportes(): Promise<void> {
   const reporteRepo = AppDataSource.getRepository(ReporteSubstituicao);
   const compRepo = AppDataSource.getRepository(Componente);
 
-  /* ── 3. Garantir ao menos UM reporte PENDENTE ─────────────── */
-
-  const countPendentes = await reporteRepo.count({
-    where: { status: StatusReporte.AGUARDANDO_APROVACAO },
-  });
-
   const equipBomba      = await EquipamentoRepository.findByTag("BC-001");
   const equipMotor      = await EquipamentoRepository.findByTag("ME-003");
   const equipCompressor = await EquipamentoRepository.findByTag("CP-012");
@@ -148,24 +142,7 @@ export async function seedReportes(): Promise<void> {
     ? await compRepo.findOne({ where: { equipamentoId: equipReductor.id, tipo: "retentor" } })
     : null;
 
-  /* Garante 1 pendente mínimo mesmo que o restante do seed já exista */
-  if (countPendentes === 0 && compBombaSelo) {
-    const pendente = reporteRepo.create({
-      pecaInstalada: "Selo Mecânico John Crane T1 Premium",
-      vidaUtilNovaPeca: 18000,
-      dataSubstituicao: new Date(),
-      observacoes:
-        "Substituição preventiva periódica. O selo anterior apresentava leve gotejamento de lubrificante na gaxeta.",
-      status: StatusReporte.AGUARDANDO_APROVACAO,
-      equipamentoId: equipBomba.id,
-      componenteId: compBombaSelo.id,
-      tecnicoId: tecnico1.id,
-    });
-    await reporteRepo.save(pendente);
-    console.log("⚠️  Reporte pendente de emergência criado (Selo Mecânico).");
-  }
-
-  /* ── 4. Seed completo (idempotente) ───────────────────────── */
+  /* ── 3. Seed completo (idempotente) ───────────────────────── */
 
   const countTotal = await reporteRepo.count();
   if (countTotal > 1) {
@@ -186,8 +163,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Rolamento SKF 6310 Explorer C3",
       vidaUtilNovaPeca: 28000,
       dataSubstituicao: daysAgo(1),
+      motivo: MotivoTroca.PREDITIVA,
+      fabricanteNovaPeca: "SKF",
       observacoes:
-        "Substituição preventiva por aumento de ruído e vibração detectados na última rota de inspeção preditiva (análise de vibração 4,2 mm/s RMS).",
+        "Substituição preventiva por aumento de ruído e vibração detectados na última rota de inspeção preditiva (análise de vibração 4,2 mm/s RMS — limite: 2,8 mm/s).",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipBomba.id,
       componenteId: compBombaRolamento.id,
@@ -200,8 +179,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Acoplamento Flexível Falk T10 Série 2024",
       vidaUtilNovaPeca: 40000,
       dataSubstituicao: daysAgo(2),
+      motivo: MotivoTroca.DESGASTE_NATURAL,
+      fabricanteNovaPeca: "Falk / Rexnord",
       observacoes:
-        "Elemento elástico do acoplamento com desgaste severo identificado durante inspeção visual de parada programada de sábado.",
+        "Elemento elástico do acoplamento com desgaste severo (trincas a 45°) identificado durante inspeção visual de parada programada de sábado. Substituição realizada imediatamente.",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipMotor.id,
       componenteId: compMotorAcoplamento.id,
@@ -214,8 +195,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Correia Dentada Gates 3VX900 OEM",
       vidaUtilNovaPeca: 10000,
       dataSubstituicao: daysAgo(3),
+      motivo: MotivoTroca.PREVENTIVA,
+      fabricanteNovaPeca: "Gates",
       observacoes:
-        "Correia original atingiu 90% da vida útil nominal. Substituição preventiva programada conforme PM-CP-012-005.",
+        "Correia original atingiu 90% da vida útil nominal com desgaste nas bordas visível. Substituição preventiva programada conforme PM-CP-012-005.",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipCompressor.id,
       componenteId: compCompressorCorreia.id,
@@ -228,8 +211,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Mancal de Deslizamento LA-2 Revisado (SKF)",
       vidaUtilNovaPeca: 30000,
       dataSubstituicao: daysAgo(0),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "SKF",
       observacoes:
-        "Temperatura do mancal atingiu 92 °C durante operação — acima do limite de 85 °C. Substituição de emergência realizada.",
+        "EMERGÊNCIA: Temperatura do mancal atingiu 97 °C durante operação — limite crítico é 85 °C. Substituição emergencial realizada às 03h42. Equipamento retornou à operação às 06h10.",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipBomba.id,
       componenteId: compBombaMancal.id,
@@ -242,8 +227,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Rolamento Timken 23040 MB/C3 W33",
       vidaUtilNovaPeca: 40000,
       dataSubstituicao: daysAgo(4),
+      motivo: MotivoTroca.PREVENTIVA,
+      fabricanteNovaPeca: "Timken",
       observacoes:
-        "Inspeção de lubrificação revelou ressecamento do graxeiro e início de corrosão fretting. Troca preventiva realizada.",
+        "Inspeção de lubrificação revelou ressecamento do graxeiro e início de corrosão fretting no anel interno. Troca preventiva realizada durante parada planejada de 2h.",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipVentilador.id,
       componenteId: compVentiladorRolamento.id,
@@ -256,8 +243,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Retentor de Óleo Viton 180×220×18 (NOK)",
       vidaUtilNovaPeca: 15000,
       dataSubstituicao: daysAgo(5),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "NOK",
       observacoes:
-        "Vazamento de óleo de caixa detectado na inspeção visual. Retentor substituído durante janela de parada de 4h.",
+        "Vazamento de óleo de caixa detectado na inspeção visual semanal — mancha de 30cm no piso. Retentor substituído durante janela de parada de 4h sem impactar produção.",
       status: StatusReporte.AGUARDANDO_APROVACAO,
       equipamentoId: equipReductor.id,
       componenteId: compReductorRetentor.id,
@@ -274,8 +263,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Rolamento FAG 6208 C3 Alta Performance",
       vidaUtilNovaPeca: 20000,
       dataSubstituicao: daysAgo(10),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "FAG / Schaeffler",
       observacoes:
-        "Substituição corretiva. Rolamento antigo apresentava travamento leve com rumor característico de pista interna danificada.",
+        "Substituição corretiva. Rolamento antigo apresentava travamento leve com rumor característico de pista interna danificada. Análise de vibração confirmou diagnóstico.",
       status: StatusReporte.APROVADO,
       equipamentoId: equipMotor.id,
       componenteId: compMotorRolamento.id,
@@ -290,8 +281,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Selo Mecânico John Crane T1 Standard",
       vidaUtilNovaPeca: 16000,
       dataSubstituicao: daysAgo(20),
+      motivo: MotivoTroca.PREVENTIVA,
+      fabricanteNovaPeca: "John Crane",
       observacoes:
-        "Substituição de acordo com o plano de manutenção preventiva anual. Sem anomalias no componente substituído.",
+        "Substituição conforme plano de manutenção preventiva anual. Sem anomalias no componente substituído — desgaste dentro do esperado para o período.",
       status: StatusReporte.APROVADO,
       equipamentoId: equipBomba.id,
       componenteId: compBombaSelo.id,
@@ -303,11 +296,13 @@ export async function seedReportes(): Promise<void> {
 
   if (compCompressorRolamento) {
     lote.push({
-      pecaInstalada: "Rolamento SKF 22316 EK/C3 + Anel Adaptador H 316",
+      pecaInstalada: "Rolamento SKF 22316 EK/C3 + Anel Adaptador H316",
       vidaUtilNovaPeca: 35000,
       dataSubstituicao: daysAgo(30),
+      motivo: MotivoTroca.PREDITIVA,
+      fabricanteNovaPeca: "SKF",
       observacoes:
-        "Rolamento substituído após análise de óleo indicar partículas metálicas acima do limite de referência da norma ISO 4406.",
+        "Rolamento substituído após análise de óleo (ASTM D6595) indicar partículas metálicas Fe > 45 ppm — acima do limite de referência ISO 4406:2021.",
       status: StatusReporte.APROVADO,
       equipamentoId: equipCompressor.id,
       componenteId: compCompressorRolamento.id,
@@ -322,8 +317,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Acoplamento Elastomérico Rexnord Omega E70",
       vidaUtilNovaPeca: 35000,
       dataSubstituicao: daysAgo(45),
+      motivo: MotivoTroca.PREVENTIVA,
+      fabricanteNovaPeca: "Rexnord",
       observacoes:
-        "Elemento elástico com trincas superficiais detectadas na inspeção com luz UV. Substituição preventiva aprovada conforme plano PM anual.",
+        "Elemento elástico com trincas superficiais a 120° detectadas na inspeção com luz UV. Substituição preventiva aprovada conforme plano PM anual — procedimento PM-ME-003-002.",
       status: StatusReporte.APROVADO,
       equipamentoId: equipMotor.id,
       componenteId: compMotorAcoplamento.id,
@@ -338,8 +335,10 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Rolamento SKF 24060 CCK30/W33 + Luva H3060",
       vidaUtilNovaPeca: 50000,
       dataSubstituicao: daysAgo(60),
+      motivo: MotivoTroca.DESGASTE_NATURAL,
+      fabricanteNovaPeca: "SKF",
       observacoes:
-        "Substituição realizada durante grande parada anual. Rolamento substituído por vida útil atingida conforme cronograma OEM.",
+        "Substituição realizada durante grande parada anual do moinho. Rolamento com 44.500h — substituído por vida útil atingida (90%) conforme cronograma OEM Siemens Flender.",
       status: StatusReporte.APROVADO,
       equipamentoId: equipReductor.id,
       componenteId: compReductorRolamento.id,
@@ -358,11 +357,13 @@ export async function seedReportes(): Promise<void> {
       pecaInstalada: "Correia Gates 3VX Paralela (alternativa não-OEM)",
       vidaUtilNovaPeca: 5000,
       dataSubstituicao: daysAgo(15),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "Gates (alternativa)",
       observacoes:
-        "Correia trocada por modelo temporário alternativo devido à falta do item original em estoque. Aguardo validação do gestor.",
+        "Correia trocada por modelo temporário alternativo devido à falta do item original em estoque. Aguardando validação do gestor para regularização.",
       status: StatusReporte.REJEITADO,
       motivoRejeicao:
-        "Não é permitida a instalação de correias paralelas sem certificação OEM para este compressor crítico. Solicitar reposição com o fornecedor Atlas Copco e reabrir OS com peça correta.",
+        "Não é permitida a instalação de correias paralelas sem certificação OEM para este compressor crítico. Solicitar reposição ao fornecedor Atlas Copco e reabrir OS com peça correta (Gates 3VX900 OEM).",
       equipamentoId: equipCompressor.id,
       componenteId: compCompressorCorreia.id,
       tecnicoId: tecnico3.id,
@@ -373,14 +374,16 @@ export async function seedReportes(): Promise<void> {
 
   if (compBombaRolamento) {
     lote.push({
-      pecaInstalada: "Rolamento Genérico 6310 (sem marca)",
+      pecaInstalada: "Rolamento Genérico 6310 (sem marca certificada)",
       vidaUtilNovaPeca: 10000,
       dataSubstituicao: daysAgo(25),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "Genérico",
       observacoes:
-        "Rolamento de marca genérica instalado em caráter emergencial devido à ruptura inesperada. Vida útil informada pelo fornecedor.",
+        "Rolamento de marca genérica instalado em caráter emergencial após ruptura inesperada às 22h. Vida útil informada pelo fornecedor de peças avulsas.",
       status: StatusReporte.REJEITADO,
       motivoRejeicao:
-        "Política de manutenção exige rolamentos de fabricantes homologados (SKF, FAG, Timken). Componente genérico não aceito para equipamento crítico. Substituir imediatamente pelo SKF 6310 Explorer.",
+        "Política PCM-MAT-003 exige rolamentos de fabricantes homologados (SKF, FAG ou Timken) para equipamentos críticos como BC-001. Substituir imediatamente pelo SKF 6310 Explorer C3 e emitir novo reporte.",
       equipamentoId: equipBomba.id,
       componenteId: compBombaRolamento.id,
       tecnicoId: tecnico2.id,
@@ -391,14 +394,16 @@ export async function seedReportes(): Promise<void> {
 
   if (compMotorRolamento) {
     lote.push({
-      pecaInstalada: "Rolamento NSK 6208 (importação direta)",
+      pecaInstalada: "Rolamento NSK 6208 ZZ (importação direta)",
       vidaUtilNovaPeca: 22000,
       dataSubstituicao: daysAgo(50),
+      motivo: MotivoTroca.CORRETIVA,
+      fabricanteNovaPeca: "NSK",
       observacoes:
-        "Rolamento NSK utilizado pois o FAG estava em falta no almoxarifado. Qualidade equivalente segundo especificação técnica.",
+        "Rolamento NSK utilizado pois o FAG estava em falta no almoxarifado. Qualidade equivalente segundo especificação técnica do fabricante NSK.",
       status: StatusReporte.REJEITADO,
       motivoRejeicao:
-        "Documento de reporte incompleto — faltam fotos da substituição e número de lote do componente instalado. Reenviar com documentação completa conforme procedimento PCM-07.",
+        "Reporte recusado por documentação incompleta — faltam: (1) fotos da peça substituída, (2) número do lote do componente instalado e (3) assinatura do supervisor no formulário de controle de qualidade. Reenviar conforme procedimento PCM-07.",
       equipamentoId: equipMotor.id,
       componenteId: compMotorRolamento.id,
       tecnicoId: tecnico1.id,
