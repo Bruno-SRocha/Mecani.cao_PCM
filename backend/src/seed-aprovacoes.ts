@@ -42,12 +42,13 @@ async function seedAprovacoes() {
     if (!tecnico1) {
       tecnico1 = UserRepository.create({
         nomeUsuario: "tecnico",
-        senha: "tecnico@123",
+        senha: "Tecnico@2026!",
         nome: "João Alves (Técnico)",
         nivel: NivelUsuario.TECNICO,
+        primeiroAcesso: false,
       });
       tecnico1 = await UserRepository.save(tecnico1);
-      console.log("✅ Usuário tecnico criado (tecnico / tecnico@123)");
+      console.log("✅ Usuário tecnico criado (tecnico / Tecnico@2026!)");
     }
 
     let tecnico2 = await UserRepository.findByNomeUsuario("tecnico2");
@@ -57,6 +58,7 @@ async function seedAprovacoes() {
         senha: "tecnico@123",
         nome: "Carlos Mendes (Técnico)",
         nivel: NivelUsuario.TECNICO,
+        primeiroAcesso: false,
       });
       tecnico2 = await UserRepository.save(tecnico2);
       console.log("✅ Usuário tecnico2 criado (tecnico2 / tecnico@123)");
@@ -69,6 +71,7 @@ async function seedAprovacoes() {
         senha: "tecnico@123",
         nome: "Fernanda Costa (Técnica)",
         nivel: NivelUsuario.TECNICO,
+        primeiroAcesso: false,
       });
       tecnico3 = await UserRepository.save(tecnico3);
       console.log("✅ Usuário tecnico3 criado (tecnico3 / tecnico@123)");
@@ -78,12 +81,13 @@ async function seedAprovacoes() {
     if (!gestor) {
       gestor = UserRepository.create({
         nomeUsuario: "gestor",
-        senha: "gestor@123",
+        senha: "Gestor@2026!",
         nome: "Supervisora Maria (Gestora)",
         nivel: NivelUsuario.GESTOR,
+        primeiroAcesso: false,
       });
       gestor = await UserRepository.save(gestor);
-      console.log("✅ Usuário gestor criado (gestor / gestor@123)");
+      console.log("✅ Usuário gestor criado (gestor / Gestor@2026!)");
     }
 
     /* ── 2. Buscar Equipamentos ──────────────────────────────── */
@@ -402,9 +406,9 @@ async function seedAprovacoes() {
     console.log(`   ✅ Aprovados:  ${aprovados}`);
     console.log(`   ❌ Rejeitados: ${rejeitados}`);
     console.log(`\n🔑 Credenciais de teste:`);
-    console.log(`   Técnicos: tecnico/tecnico@123 · tecnico2/tecnico@123 · tecnico3/tecnico@123`);
-    console.log(`   Gestor:   gestor/gestor@123`);
-    console.log(`   Admin:    admin/admin@123`);
+    console.log(`   Técnicos: tecnico/Tecnico@2026! · tecnico2/tecnico@123 · tecnico3/tecnico@123`);
+    console.log(`   Gestor:   gestor/Gestor@2026!`);
+    console.log(`   Admin:    admin/Admin@Mecanicao2026`);
 
   } catch (error) {
     console.error("\n❌ Erro durante o seed:", error);

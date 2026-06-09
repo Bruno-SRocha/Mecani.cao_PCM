@@ -6,7 +6,7 @@
  *
  * Credenciais padrão (devem ser alteradas em produção):
  *   Usuário: admin
- *   Senha:   admin@123
+ *   Senha:   Admin@Mecanicao2026
  *   Nível:   ADMIN
  *
  * Se o usuário "admin" já existir no banco, o seed é ignorado,
@@ -32,7 +32,7 @@ export async function seedAdminUser(): Promise<void> {
   /* Cria o usuário admin padrão */
   const admin = UserRepository.create({
     nomeUsuario: "admin",
-    senha: "admin@123",
+    senha: "Admin@Mecanicao2026",
     nome: "Administrador do Sistema",
     nivel: NivelUsuario.ADMIN,
     email: "admin@mecanicao.com.br",
@@ -42,6 +42,6 @@ export async function seedAdminUser(): Promise<void> {
 
   await UserRepository.save(admin);
 
-  console.log("✅ Usuário admin padrão criado (admin / admin@123)");
+  console.log("✅ Usuário admin padrão criado (admin / Admin@Mecanicao2026)");
   console.log("⚠️  ATENÇÃO: Altere a senha padrão em produção!");
 }

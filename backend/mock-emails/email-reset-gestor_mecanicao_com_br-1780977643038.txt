@@ -1,0 +1,17 @@
+Para: gestor@mecanicao.com.br
+Assunto: Mecâni.cão PCM - Recuperação de Senha
+Data: 09/06/2026, 01:00:43
+
+Olá Gestor de Testes,
+
+Recebemos uma solicitação para redefinir a senha da sua conta de colaborador no sistema Mecâni.cão PCM.
+
+Para definir uma nova senha, clique no link abaixo (ou copie e cole no seu navegador):
+http://localhost:3000/redefinir-senha?token=3ch3qq66w52fkdx7zhy9f4
+
+Atenção: Este link é de uso único e expirará em 30 minutos (às 01:30).
+
+Se você não solicitou esta redefinição, por favor desconsidere este e-mail.
+
+Atenciosamente,
+Equipe de TI Mecâni.cão PCM

@@ -19,7 +19,7 @@ async function run() {
   const loginTecRes = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nomeUsuario: "tecnico", senha: "tecnico@123" }),
+    body: JSON.stringify({ nomeUsuario: "tecnico", senha: "Tecnico@2026!" }),
   });
   if (!loginTecRes.ok) throw new Error("Technician login failed");
   const loginTecData = await loginTecRes.json() as any;
@@ -31,7 +31,7 @@ async function run() {
   const loginGestorRes = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nomeUsuario: "gestor", senha: "gestor@123" }),
+    body: JSON.stringify({ nomeUsuario: "gestor", senha: "Gestor@2026!" }),
   });
   if (!loginGestorRes.ok) throw new Error("Gestor login failed");
   const loginGestorData = await loginGestorRes.json() as any;
