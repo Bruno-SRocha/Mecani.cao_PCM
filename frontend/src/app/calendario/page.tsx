@@ -45,7 +45,7 @@ export default function CalendarioPage() {
   // View settings
   const [currentDate, setCurrentDate] = useState<Date>(() => getSyncedDate());
   const [view, setView] = useState<CalendarView>("month");
-  const [filtroTipo, setFiltroTipo] = useState<"PREVENTIVA" | "TODAS">("PREVENTIVA");
+  const [filtroTipo, setFiltroTipo] = useState<"PREVENTIVA" | "TODAS">("TODAS");
   const [busca, setBusca] = useState("");
 
   // Modals / Details
@@ -158,6 +158,36 @@ export default function CalendarioPage() {
     const border = om.status === "EM_EXECUCAO" ? "rgba(251, 191, 36, 0.3)" : "var(--border-subtle)";
 
     return { label, color, bg, border };
+  }, []);
+
+  // Helper: Maintenance type label, color and styling mapping
+  const getTipoManutencaoDisplay = useCallback((tipo: TipoManutencao) => {
+    const bgMap: Record<TipoManutencao, string> = {
+      PREVENTIVA: "var(--cyan-badge-bg)",
+      CORRETIVA_PROGRAMADA: "var(--yellow-badge-bg)",
+      CORRETIVA_EMERGENCIAL: "var(--red-badge-bg)",
+      PREDITIVA: "var(--orange-glow)",
+    };
+
+    const colorMap: Record<TipoManutencao, string> = {
+      PREVENTIVA: "var(--cyan-badge)",
+      CORRETIVA_PROGRAMADA: "var(--yellow-badge)",
+      CORRETIVA_EMERGENCIAL: "var(--red-badge)",
+      PREDITIVA: "var(--orange)",
+    };
+
+    const borderMap: Record<TipoManutencao, string> = {
+      PREVENTIVA: "var(--cyan-badge-border)",
+      CORRETIVA_PROGRAMADA: "var(--yellow-badge-border)",
+      CORRETIVA_EMERGENCIAL: "var(--red-badge-border)",
+      PREDITIVA: "var(--border-accent)",
+    };
+
+    return {
+      bg: bgMap[tipo] || "rgba(148, 163, 184, 0.08)",
+      color: colorMap[tipo] || "var(--text-secondary)",
+      border: borderMap[tipo] || "var(--border-subtle)",
+    };
   }, []);
 
   // Calendar Math: MONTH VIEW
@@ -561,6 +591,7 @@ export default function CalendarioPage() {
                       <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar">
                         {omsDia.map((om) => {
                           const status = getStatusDisplay(om);
+                          const tipoStyle = getTipoManutencaoDisplay(om.tipo);
                           return (
                             <div
                               key={om.id}
@@ -571,9 +602,9 @@ export default function CalendarioPage() {
                               onMouseLeave={handleMouseLeaveCard}
                               className="p-1.5 rounded-lg border text-[11px] cursor-grab active:cursor-grabbing hover:border-orange transition-all duration-150 select-none overflow-hidden"
                               style={{
-                                background: status.bg,
-                                borderColor: status.border,
-                                borderLeft: `3px solid ${status.color}`,
+                                background: tipoStyle.bg,
+                                borderColor: tipoStyle.border,
+                                borderLeft: `3px solid ${tipoStyle.color}`,
                               }}
                             >
                               <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -647,6 +678,7 @@ export default function CalendarioPage() {
                       ) : (
                         omsDia.map((om) => {
                           const status = getStatusDisplay(om);
+                          const tipoStyle = getTipoManutencaoDisplay(om.tipo);
                           const time = om.dataInicioPrevisto
                             ? formatToBrasilia(om.dataInicioPrevisto, { hour: "2-digit", minute: "2-digit" })
                             : "—";
@@ -661,9 +693,9 @@ export default function CalendarioPage() {
                               onMouseLeave={handleMouseLeaveCard}
                               className="p-3 rounded-xl border text-[12px] cursor-grab active:cursor-grabbing hover:border-orange transition-all duration-150 select-none flex flex-col gap-1.5"
                               style={{
-                                background: status.bg,
-                                borderColor: status.border,
-                                borderLeft: `3px solid ${status.color}`,
+                                background: tipoStyle.bg,
+                                borderColor: tipoStyle.border,
+                                borderLeft: `3px solid ${tipoStyle.color}`,
                               }}
                             >
                               <div className="flex items-center justify-between">
@@ -730,6 +762,7 @@ export default function CalendarioPage() {
                       <div className="space-y-4 max-w-4xl">
                         {omsDia.map((om) => {
                           const status = getStatusDisplay(om);
+                          const tipoStyle = getTipoManutencaoDisplay(om.tipo);
                           const time = om.dataInicioPrevisto
                             ? formatToBrasilia(om.dataInicioPrevisto, { hour: "2-digit", minute: "2-digit" })
                             : "—";
@@ -740,7 +773,7 @@ export default function CalendarioPage() {
                               onClick={() => setSelectedOM(om)}
                               className="info-sub-card flex items-start gap-4 cursor-pointer hover:border-orange transition-all duration-150 border-l-4"
                               style={{
-                                borderLeftColor: status.color,
+                                borderLeftColor: tipoStyle.color,
                               }}
                             >
                               {/* Time Column */}
@@ -764,8 +797,8 @@ export default function CalendarioPage() {
                                   <span
                                     className="text-[9px] font-bold uppercase px-2 py-0.5 rounded"
                                     style={{
-                                      background: "var(--cyan-badge-bg)",
-                                      color: "var(--cyan-badge)",
+                                      background: tipoStyle.bg,
+                                      color: tipoStyle.color,
                                     }}
                                   >
                                     {TIPO_MANUTENCAO_LABELS[om.tipo]}
@@ -927,9 +960,15 @@ export default function CalendarioPage() {
                   <h4 className="text-[11px] font-bold uppercase tracking-wider text-txt-muted mb-1">
                     Tipo de Manutenção
                   </h4>
-                  <p className="text-[14px] font-bold text-txt-primary">
+                  <span
+                    className="inline-block text-[12px] font-bold tracking-wider px-2 py-0.5 rounded uppercase mt-0.5"
+                    style={{
+                      background: getTipoManutencaoDisplay(selectedOM.tipo).bg,
+                      color: getTipoManutencaoDisplay(selectedOM.tipo).color,
+                    }}
+                  >
                     {TIPO_MANUTENCAO_LABELS[selectedOM.tipo]}
-                  </p>
+                  </span>
                 </div>
               </div>
 
