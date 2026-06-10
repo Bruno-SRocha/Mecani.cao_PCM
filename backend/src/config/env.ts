@@ -28,11 +28,12 @@ export const env = {
   PORT: Number(process.env.PORT) || 3333,
 
   /* Banco de dados MySQL */
-  DB_HOST: process.env.DB_HOST ?? "localhost",
-  DB_PORT: Number(process.env.DB_PORT) || 3306,
-  DB_USER: process.env.DB_USER ?? "root",
-  DB_PASS: process.env.DB_PASS ?? "",
-  DB_NAME: process.env.DB_NAME ?? "mecanicao_pcm",
+  DATABASE_URL: process.env.DATABASE_URL ?? process.env.MYSQL_URL ?? process.env.MYSQL_PRIVATE_URL ?? "",
+  DB_HOST: process.env.DB_HOST ?? process.env.MYSQLHOST ?? process.env.MYSQL_HOST ?? "localhost",
+  DB_PORT: Number(process.env.DB_PORT ?? process.env.MYSQLPORT ?? process.env.MYSQL_PORT) || 3306,
+  DB_USER: process.env.DB_USER ?? process.env.MYSQLUSER ?? process.env.MYSQL_USER ?? "root",
+  DB_PASS: process.env.DB_PASS ?? process.env.MYSQLPASSWORD ?? process.env.MYSQL_PASSWORD ?? "",
+  DB_NAME: process.env.DB_NAME ?? process.env.MYSQLDATABASE ?? process.env.MYSQL_DATABASE ?? "mecanicao_pcm",
   DB_SOCKET: process.env.DB_SOCKET ?? "",
 
   /* JWT — Autenticação */
@@ -42,3 +43,16 @@ export const env = {
   /* CORS — Origem permitida */
   CORS_ORIGIN: process.env.CORS_ORIGIN ?? "http://localhost:3000",
 };
+
+/* Validação de segurança em ambiente de produção */
+if (env.NODE_ENV === "production") {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET === "dev_secret_inseguro") {
+    console.error("====================================================================");
+    console.error("ERRO CRÍTICO DE SEGURANÇA: JWT_SECRET não configurado ou inseguro!");
+    console.error("Em modo 'production', defina um JWT_SECRET forte nas variáveis de");
+    console.error("ambiente da sua hospedagem (ex: Railway, Vercel).");
+    console.error("====================================================================");
+    process.exit(1);
+  }
+}
+
