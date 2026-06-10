@@ -226,7 +226,7 @@ Colaborador: ${credenciaisGeradas.nome}
 Usuário: ${credenciaisGeradas.username}
 E-mail: ${credenciaisGeradas.email}
 Senha Temporária: ${credenciaisGeradas.senhaGerada}
-Acesso: http://localhost:3000/
+Acesso: https://mecani-cao-pcm.vercel.app
 ------------------------------------`;
 
     navigator.clipboard.writeText(texto).then(() => {
