@@ -4,13 +4,13 @@
   "description": "API REST do sistema MECÂNI.CÃO PCM — Gestão de Saúde de Ativos Industriais",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only -r reflect-metadata src/server.ts",
+    "dev": "ts-node src/config/create-db.ts && ts-node-dev --respawn --transpile-only -r reflect-metadata src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/config/create-db.js && node dist/server.js",
     "typeorm": "ts-node -r reflect-metadata ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run typeorm -- migration:generate -d src/config/database.ts",
-    "migration:run": "npm run typeorm -- migration:run -d src/config/database.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/config/database.ts"
+    "migration:generate": "ts-node src/config/create-db.ts && npm run typeorm -- migration:generate -d src/config/database.ts",
+    "migration:run": "ts-node src/config/create-db.ts && npm run typeorm -- migration:run -d src/config/database.ts",
+    "migration:revert": "ts-node src/config/create-db.ts && npm run typeorm -- migration:revert -d src/config/database.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
