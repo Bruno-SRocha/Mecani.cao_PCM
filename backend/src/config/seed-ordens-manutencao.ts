@@ -153,7 +153,7 @@ export async function seedOrdensManutencao(): Promise<void> {
       status: StatusOM.ABERTA,
       dataInicioPrevisto: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // em 3 dias
       tempoEstimado: 2,
-      materialsNecessarios: [
+      materiaisNecessarios: [
         "Analisador de vibração SKF CMAS 100",
         "Massa de balanceamento (kit)",
         "EPI completo para trabalho em altura",
